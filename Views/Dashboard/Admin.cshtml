@@ -1,0 +1,464 @@
+﻿@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var topResidents = ViewBag.TopResidents as List<SmartRecyclingRewardsSystem.Models.ApplicationUser>;
+    var recentSubmissions = ViewBag.RecentSubmissions as List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>;
+    var matLabels = ViewBag.ChartMaterialLabels as List<string>;
+    var matWeights = ViewBag.ChartMaterialWeights as List<decimal>;
+    var monLabels = ViewBag.ChartMonthLabels as List<string>;
+    var monCounts = ViewBag.ChartMonthCounts as List<int>;
+
+    string matLabelsJson = Newtonsoft.Json.JsonConvert.SerializeObject(matLabels ?? new List<string>());
+    string matWeightsJson = Newtonsoft.Json.JsonConvert.SerializeObject(matWeights ?? new List<decimal>());
+    string monLabelsJson = Newtonsoft.Json.JsonConvert.SerializeObject(monLabels ?? new List<string>());
+    string monCountsJson = Newtonsoft.Json.JsonConvert.SerializeObject(monCounts ?? new List<int>());
+}
+
+@section styles {
+    <style>
+        .dash-wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .dash-hello {
+            margin-bottom: 28px;
+        }
+
+            .dash-hello h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--green-deep);
+            }
+
+            .dash-hello p {
+                color: var(--text-muted);
+                font-size: 14px;
+                margin-top: 4px;
+            }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(6,1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-family: 'Syne',sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--green-deep);
+            line-height: 1;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .section-head h2 {
+                font-family: 'Syne',sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+            .section-head a {
+                font-size: 13px;
+                color: var(--green-mid);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+        .chart-wrap {
+            padding: 20px;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .sub-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 10px 14px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .sub-table td {
+                padding: 10px 14px;
+                font-size: 12px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+            }
+
+            .sub-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-verified {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .leader-list {
+            padding: 0;
+        }
+
+        .leader-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .leader-row:last-child {
+                border-bottom: none;
+            }
+
+        .leader-rank {
+            font-family: 'Syne',sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--green-bright);
+            width: 28px;
+            flex-shrink: 0;
+        }
+
+        .leader-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .leader-pts {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-mid);
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .admin-btn {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 13px 14px;
+            background: #f8fdf9;
+            border: 1px solid #d4edda;
+            border-radius: 9px;
+            text-decoration: none;
+            color: var(--green-mid);
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+            .admin-btn:hover {
+                background: #edf7f1;
+                color: var(--green-mid);
+            }
+
+            .admin-btn i {
+                font-size: 16px;
+                width: 20px;
+                text-align: center;
+            }
+
+        @@media(max-width:900px) {
+            .stats-row {
+                grid-template-columns: repeat(3,1fr);
+            }
+
+            .charts-row, .bottom-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media(max-width:480px) {
+            .stats-row {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+    </style>
+}
+
+@* Chart.js CDN *@
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<div class="dash-wrap">
+
+    <div class="dash-hello">
+        <h1>Admin Dashboard</h1>
+        <p>System overview for EcoRewards SA — eThekwini, KwaZulu-Natal</p>
+    </div>
+
+    @* ── Stat cards ──────────────────────────────────────────── *@
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Residents</div>
+            <div class="stat-value">@ViewBag.TotalResidents</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Officers</div>
+            <div class="stat-value">@ViewBag.TotalOfficers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Submissions</div>
+            <div class="stat-value">@ViewBag.TotalSubmissions</div>
+            <div class="stat-sub">@ViewBag.PendingCount pending</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Verified</div>
+            <div class="stat-value">@ViewBag.TotalVerified</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Weight Recycled</div>
+            <div class="stat-value">@string.Format("{0:0.#}", ViewBag.TotalWeightKg)</div>
+            <div class="stat-sub">kg total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">CO₂ Saved</div>
+            <div class="stat-value">@string.Format("{0:0.#}", ViewBag.TotalCo2)</div>
+            <div class="stat-sub">kg equivalent</div>
+        </div>
+    </div>
+
+    @* ── Charts ──────────────────────────────────────────────── *@
+    <div class="charts-row">
+        <div class="section-card">
+            <div class="section-head">
+                <h2><i class="fa fa-chart-bar fa-sm"></i> Weight by Material (kg)</h2>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="materialChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="section-card">
+            <div class="section-head">
+                <h2><i class="fa fa-chart-line fa-sm"></i> Monthly Submissions (last 6 months)</h2>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="monthChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    @* ── Bottom row ──────────────────────────────────────────── *@
+    <div class="bottom-row">
+
+        @* Recent submissions *@
+        <div class="section-card">
+            <div class="section-head">
+                <h2>Recent Submissions</h2>
+                <a href="@Url.Action("Index","RecyclingSubmission")">View all</a>
+            </div>
+            <table class="sub-table">
+                <thead>
+                    <tr><th>Resident</th><th>Material</th><th>Weight</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    @if (recentSubmissions != null)
+                    {
+                        foreach (var s in recentSubmissions)
+                        {
+                            <tr>
+                                <td>@s.Resident.FullName</td>
+                                <td>@s.MaterialType.Name</td>
+                                <td>@s.WeightKg kg</td>
+                                <td>
+                                    @if (s.Status == SmartRecyclingRewardsSystem.Models.SubmissionStatus.Pending)
+                                    {<span class="badge-pill badge-pending">Pending</span> }
+                                    else if (s.Status == SmartRecyclingRewardsSystem.Models.SubmissionStatus.Verified)
+                                    { <span class="badge-pill badge-verified">Verified</span> }
+                                    else
+                                    { <span class="badge-pill badge-rejected">Rejected</span>}
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+            @* Top residents leaderboard *@
+            <div class="section-card">
+                <div class="section-head">
+                    <h2><i class="fa fa-ranking-star fa-sm"></i> Top Residents</h2>
+                    <a href="@Url.Action("Index","Leaderboard")">Full leaderboard</a>
+                </div>
+                <div class="leader-list">
+                    @if (topResidents != null)
+                    {
+                        int rank = 1;
+                        foreach (var r in topResidents)
+                        {
+                            <div class="leader-row">
+                                <span class="leader-rank">#@rank</span>
+                                <span class="leader-name">@r.FullName</span>
+                                <span class="leader-pts">@r.PointsBalance pts</span>
+                            </div>
+                            rank++;
+                        }
+                    }
+                </div>
+            </div>
+
+            @* Admin quick actions *@
+            <div class="section-card">
+                <div class="section-head"><h2><i class="fa fa-bolt fa-sm"></i> Admin Actions</h2></div>
+                <div class="admin-actions">
+                    <a href="@Url.Action("Index","MaterialType")" class="admin-btn"><i class="fa fa-recycle"></i> Materials</a>
+                    <a href="@Url.Action("Index","DropOffPoint")" class="admin-btn"><i class="fa fa-location-dot"></i> Drop-Offs</a>
+                    <a href="@Url.Action("Index","Report")" class="admin-btn"><i class="fa fa-file-pdf"></i> Reports</a>
+                    <a href="@Url.Action("Index","SystemConfig")" class="admin-btn"><i class="fa fa-gear"></i> Settings</a>
+                    <a href="@Url.Action("Index","UserManagement")" class="admin-btn"><i class="fa fa-users"></i> Users</a>
+                    <a href="@Url.Action("Index","CollectionEvent")" class="admin-btn"><i class="fa fa-calendar"></i> Events</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+    var matLabels  = @Html.Raw(matLabelsJson);
+    var matWeights = @Html.Raw(matWeightsJson);
+    var monLabels  = @Html.Raw(monLabelsJson);
+    var monCounts  = @Html.Raw(monCountsJson);
+
+    // Bar chart — weight by material
+    new Chart(document.getElementById('materialChart'), {
+        type: 'bar',
+        data: {
+            labels: matLabels,
+            datasets: [{
+                label: 'kg recycled',
+                data: matWeights,
+                backgroundColor: ['#f59e0b','#3b82f6','#10b981','#6b7280','#ef4444'],
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Line chart — monthly submissions
+    new Chart(document.getElementById('monthChart'), {
+        type: 'line',
+        data: {
+            labels: monLabels,
+            datasets: [{
+                label: 'Submissions',
+                data: monCounts,
+                borderColor: '#2d6a4f',
+                backgroundColor: 'rgba(45,106,79,0.08)',
+                borderWidth: 2.5,
+                pointBackgroundColor: '#b7e04a',
+                pointRadius: 5,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+    </script>
+}

@@ -1,0 +1,237 @@
+﻿@{
+    ViewBag.Title = "Welcome";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        /* Remove nav offset — hero fills full viewport */
+        .page-body {
+            margin-top: 0 !important;
+        }
+
+        /* ── Full-screen hero ─────────────────────────────────────── */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Background video */
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        /* Dark overlay so text is readable */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient( to bottom, rgba(10, 30, 18, 0.55) 0%, rgba(10, 30, 18, 0.72) 100% );
+            z-index: 1;
+        }
+
+        /* Content centred on top */
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Small pill above name */
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(183, 224, 74, 0.15);
+            border: 1px solid rgba(183, 224, 74, 0.35);
+            color: #b7e04a;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            margin-bottom: 28px;
+        }
+
+        /* App name */
+        .hero-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(52px, 10vw, 96px);
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+            letter-spacing: -3px;
+            margin-bottom: 10px;
+        }
+
+            .hero-title span {
+                color: #b7e04a;
+            }
+
+        /* Tagline */
+        .hero-tagline {
+            font-size: clamp(15px, 2vw, 18px);
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 52px;
+        }
+
+        /* Button group */
+        .hero-buttons {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-get-started {
+            background: #b7e04a;
+            color: #1a3a2a;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 4px 24px rgba(183, 224, 74, 0.3);
+        }
+
+            .btn-get-started:hover {
+                background: #c9f05b;
+                color: #1a3a2a;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 32px rgba(183, 224, 74, 0.4);
+            }
+
+        .btn-login {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 16px 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+        }
+
+            .btn-login:hover {
+                background: rgba(255, 255, 255, 0.18);
+                border-color: rgba(255, 255, 255, 0.5);
+                color: #ffffff;
+                transform: translateY(-2px);
+            }
+
+        /* Scroll hint at bottom */
+        .scroll-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.35);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            animation: bounce 2s infinite;
+        }
+
+        @@keyframes bounce {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(6px);
+            }
+        }
+
+        /* ── Responsive ───────────────────────────────────────────── */
+        @@media (max-width: 480px) {
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-get-started, .btn-login {
+                justify-content: center;
+            }
+
+            .hero-title {
+                letter-spacing: -1.5px;
+            }
+        }
+    </style>
+}
+
+<section class="hero">
+
+    @* Background recycling video from Pexels (free, no attribution required) *@
+    <video class="hero-video"
+           autoplay muted loop playsinline
+           poster="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?w=1400&q=80">
+        <source src="https://www.pexels.com/download/video/3571264/" type="video/mp4" />
+        @* Fallback: if video fails to load, the poster image shows instead *@
+    </video>
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <span class="hero-eyebrow">
+            <i class="fa fa-leaf fa-xs"></i>
+            eThekwini &nbsp;·&nbsp; KwaZulu-Natal
+        </span>
+
+        <h1 class="hero-title">
+            Eco<span>Rewards</span> SA
+        </h1>
+
+        <p class="hero-tagline">Recycle. Earn. Repeat.</p>
+
+        <div class="hero-buttons">
+            <a href="@Url.Action("Register", "Account")" class="btn-get-started">
+                <i class="fa fa-leaf"></i> Get Started
+            </a>
+            <a href="@Url.Action("Login", "Account")" class="btn-login">
+                <i class="fa fa-right-to-bracket"></i> Log In
+            </a>
+        </div>
+
+    </div>
+
+    <div class="scroll-hint">
+        <i class="fa fa-chevron-down fa-xs"></i>
+        <span>Scroll</span>
+    </div>
+
+</section>

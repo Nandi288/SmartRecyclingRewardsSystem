@@ -1,0 +1,318 @@
+﻿@model SmartRecyclingRewardsSystem.Models.LoginViewModel
+@{
+    ViewBag.Title = "Log In";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .auth-page {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+            background: var(--offwhite);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(26,58,42,0.08);
+        }
+
+        /* Green header strip */
+        .auth-header {
+            background: var(--green-deep);
+            padding: 32px 36px 28px;
+            text-align: center;
+        }
+
+            .auth-header .brand-icon {
+                width: 48px;
+                height: 48px;
+                background: var(--lime);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                color: var(--green-deep);
+                margin: 0 auto 14px;
+            }
+
+            .auth-header h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 22px;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 4px;
+            }
+
+            .auth-header p {
+                font-size: 13px;
+                color: rgba(255,255,255,0.55);
+                margin: 0;
+            }
+
+        /* Form body */
+        .auth-body {
+            padding: 32px 36px 36px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-dark);
+                margin-bottom: 7px;
+            }
+
+        .form-control-srr {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #d1d9d4;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+            .form-control-srr:focus {
+                border-color: var(--green-mid);
+                box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+            }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+            .input-icon-wrap .form-control-srr {
+                padding-left: 40px;
+            }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* Password toggle */
+        .input-icon-wrap .toggle-pw {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-pw:hover {
+            color: var(--green-mid);
+        }
+
+        .remember-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+            .remember-row input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                accent-color: var(--green-mid);
+                cursor: pointer;
+            }
+
+            .remember-row label {
+                font-size: 13px;
+                color: var(--text-muted);
+                cursor: pointer;
+                margin: 0;
+            }
+
+        .btn-auth {
+            width: 100%;
+            background: var(--green-mid);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: background 0.2s, transform 0.15s;
+            margin-bottom: 20px;
+        }
+
+            .btn-auth:hover {
+                background: #245c42;
+                transform: translateY(-1px);
+            }
+
+        .auth-divider {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+            .auth-divider a {
+                color: var(--green-mid);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .auth-divider a:hover {
+                    text-decoration: underline;
+                }
+
+        /* Admin hint box */
+        .admin-hint {
+            background: #f0faf4;
+            border: 1px solid var(--green-bright);
+            border-radius: 8px;
+            padding: 12px 14px;
+            margin-bottom: 24px;
+            font-size: 12px;
+            color: var(--green-mid);
+        }
+
+            .admin-hint strong {
+                color: var(--green-deep);
+            }
+
+        .validation-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #991b1b;
+            margin-bottom: 20px;
+        }
+    </style>
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <div class="brand-icon"><i class="fa fa-recycle"></i></div>
+            <h1>Welcome back</h1>
+            <p>Log in to your EcoRewards SA account</p>
+        </div>
+
+        <div class="auth-body">
+
+            @* Admin hint — shows default credentials *@
+            <div class="admin-hint">
+                <i class="fa fa-circle-info"></i>
+                <strong>Default Admin:</strong>&nbsp;
+                admin@smartrecycling.co.za &nbsp;/&nbsp; Admin@123
+            </div>
+
+            @* Validation errors *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-error">
+                    <i class="fa fa-circle-exclamation"></i>
+                    @Html.ValidationSummary(true)
+                </div>
+            }
+
+            @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl },
+                FormMethod.Post, new { @autocomplete = "off" }))
+            {
+                @Html.AntiForgeryToken()
+
+                @* Email *@
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-envelope input-icon"></i>
+                        @Html.TextBoxFor(m => m.Email, new
+                        {
+                            @class = "form-control-srr",
+                            placeholder = "you@example.com",
+                            type = "email"
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger", style = "font-size:12px" })
+                </div>
+
+                @* Password *@
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-lock input-icon"></i>
+                        @Html.PasswordFor(m => m.Password, new
+                        {
+                            @class = "form-control-srr",
+                            placeholder = "Enter your password",
+                            id = "passwordField"
+                        })
+                        <button type="button" class="toggle-pw" onclick="togglePassword()">
+                            <i class="fa fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger", style = "font-size:12px" })
+                </div>
+
+                @* Remember me *@
+                <div class="remember-row">
+                    @Html.CheckBoxFor(m => m.RememberMe)
+                    <label for="RememberMe">Keep me logged in</label>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fa fa-right-to-bracket"></i> Log In
+                </button>
+            }
+
+            <div class="auth-divider">
+                Don't have an account?
+                <a href="@Url.Action("Register", "Account")">Create one free</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>function togglePassword() {
+        var field = document.getElementById('passwordField');
+        var icon  = document.getElementById('toggleIcon');
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.className = 'fa fa-eye-slash';
+        } else {
+            field.type = 'password';
+            icon.className = 'fa fa-eye';
+        }
+    }</script>
+}

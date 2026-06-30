@@ -1,0 +1,418 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title - EcoRewards SA</title>
+
+    @* Bootstrap 5 *@
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    @* Font Awesome for icons *@
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    @* Google Fonts: Syne (display) + Inter (body) *@
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        /* ── Token System ─────────────────────────────────────── */
+        :root {
+            --green-deep: #1a3a2a;
+            --green-mid: #2d6a4f;
+            --green-bright: #74c69d;
+            --lime: #b7e04a;
+            --offwhite: #f5f2eb;
+            --text-dark: #111c16;
+            --text-muted: #6b7c6e;
+            --nav-h: 64px;
+        }
+
+        /* ── Base ─────────────────────────────────────────────── */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: var(--text-dark);
+            background: var(--offwhite);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Navbar ───────────────────────────────────────────── */
+        .srr-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-h);
+            background: var(--green-deep);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(116,198,157,0.15);
+        }
+
+            .srr-nav .brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .srr-nav .brand-icon {
+                width: 34px;
+                height: 34px;
+                background: var(--lime);
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                color: var(--green-deep);
+            }
+
+            .srr-nav .brand-name {
+                font-family: 'Syne', sans-serif;
+                font-size: 17px;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: -0.3px;
+            }
+
+                .srr-nav .brand-name span {
+                    color: var(--lime);
+                }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: auto;
+        }
+
+            .nav-links a {
+                color: rgba(255,255,255,0.75);
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                padding: 7px 14px;
+                border-radius: 6px;
+                transition: color 0.2s, background 0.2s;
+            }
+
+                .nav-links a:hover {
+                    color: #fff;
+                    background: rgba(255,255,255,0.08);
+                }
+
+                .nav-links a.nav-cta {
+                    background: var(--lime);
+                    color: var(--green-deep);
+                    font-weight: 600;
+                    padding: 7px 18px;
+                }
+
+                    .nav-links a.nav-cta:hover {
+                        background: #c8f05a;
+                        color: var(--green-deep);
+                    }
+
+        /* Unread notification badge */
+        .nav-bell {
+            position: relative;
+        }
+
+        .nav-badge {
+            position: absolute;
+            top: 2px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 1.5px solid var(--green-deep);
+        }
+
+        /* ── Page body offset for fixed nav ──────────────────── */
+        .page-body {
+            margin-top: var(--nav-h);
+            flex: 1;
+        }
+
+        /* ── Role pill shown in nav when logged in ────────────── */
+        .role-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+            .role-pill.resident {
+                background: rgba(116,198,157,0.2);
+                color: var(--green-bright);
+            }
+
+            .role-pill.collectionofficer {
+                background: rgba(183,224,74,0.2);
+                color: var(--lime);
+            }
+
+            .role-pill.admin {
+                background: rgba(239,68,68,0.2);
+                color: #f87171;
+            }
+
+        /* ── Flash messages ───────────────────────────────────── */
+        .flash-bar {
+            padding: 12px 2rem;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid transparent;
+        }
+
+        .flash-success {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .flash-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .flash-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        /* ── Footer ───────────────────────────────────────────── */
+        .srr-footer {
+            background: var(--green-deep);
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            font-size: 13px;
+            padding: 20px 2rem;
+            border-top: 1px solid rgba(116,198,157,0.1);
+        }
+
+            .srr-footer a {
+                color: var(--green-bright);
+                text-decoration: none;
+            }
+
+        /* ── Utility: section cards used across the app ───────── */
+        .srr-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        /* ── Page header strip (used on inner pages) ──────────── */
+        .page-header {
+            background: var(--green-deep);
+            color: #fff;
+            padding: 36px 2rem 32px;
+        }
+
+            .page-header h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 28px;
+                font-weight: 700;
+                margin-bottom: 4px;
+            }
+
+            .page-header p {
+                color: rgba(255,255,255,0.6);
+                font-size: 14px;
+                margin: 0;
+            }
+
+        /* ── Status badges ────────────────────────────────────── */
+        .badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-verified {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* ── Buttons ──────────────────────────────────────────── */
+        .btn-srr {
+            background: var(--green-mid);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+            .btn-srr:hover {
+                background: #245c42;
+                color: #fff;
+                transform: translateY(-1px);
+            }
+
+        .btn-srr-lime {
+            background: var(--lime);
+            color: var(--green-deep);
+        }
+
+            .btn-srr-lime:hover {
+                background: #c8f05a;
+                color: var(--green-deep);
+            }
+
+        .btn-srr-outline {
+            background: transparent;
+            color: var(--green-mid);
+            border: 1.5px solid var(--green-mid);
+        }
+
+            .btn-srr-outline:hover {
+                background: var(--green-mid);
+                color: #fff;
+            }
+
+        /* ── Responsive ───────────────────────────────────────── */
+        @@media (max-width: 768px) {
+            .srr-nav {
+                padding: 0 1rem;
+            }
+
+            .nav-links a:not(.nav-cta) {
+                display: none;
+            }
+        }
+    </style>
+
+    @RenderSection("styles", required: false)
+</head>
+<body>
+
+    @* ── Navigation ──────────────────────────────────────────────── *@
+    <nav class="srr-nav">
+        <a href="@Url.Action("Index", "Home")" class="brand">
+            <div class="brand-icon"><i class="fa fa-recycle"></i></div>
+            <span class="brand-name">Eco<span>Rewards</span> SA</span>
+        </a>
+
+        <div class="nav-links">
+            @if (Request.IsAuthenticated)
+            {
+                @* Show different nav depending on role *@
+                if (User.IsInRole("Resident"))
+                {
+                    <span class="role-pill resident"><i class="fa fa-house fa-xs"></i> Resident</span>
+                    <a href="@Url.Action("Create", "RecyclingSubmission")"><i class="fa fa-plus"></i> Log Recycling</a>
+                    <a href="@Url.Action("Index", "RecyclingSubmission")">My Submissions</a>
+                    <a href="@Url.Action("Index", "PointTransaction")">Points</a>
+                    <a href="@Url.Action("Index", "Leaderboard")">Leaderboard</a>
+                }
+                else if (User.IsInRole("CollectionOfficer"))
+                {
+                    <span class="role-pill collectionofficer"><i class="fa fa-shield fa-xs"></i> Officer</span>
+                    <a href="@Url.Action("Pending", "RecyclingSubmission")">Pending</a>
+                    <a href="@Url.Action("Index", "RecyclingSubmission")">All Submissions</a>
+                }
+                else if (User.IsInRole("Admin"))
+                {
+                    <span class="role-pill admin"><i class="fa fa-crown fa-xs"></i> Admin</span>
+                    <a href="@Url.Action("Index", "Admin")">Dashboard</a>
+                    <a href="@Url.Action("Index", "MaterialType")">Materials</a>
+                    <a href="@Url.Action("Index", "DropOffPoint")">Drop-Off Points</a>
+                    <a href="@Url.Action("Index", "Report")">Reports</a>
+                }
+
+                @* Notification bell *@
+                <a href="@Url.Action("Index", "Notification")" class="nav-bell">
+                    <i class="fa fa-bell"></i>
+                    @* Show red dot if unread notifications exist *@
+                    @if (ViewBag.UnreadCount != null && ViewBag.UnreadCount > 0)
+                    {
+                        <span class="nav-badge"></span>
+                    }
+                </a>
+
+                <form id="logoutForm" action="@Url.Action("LogOff", "Account")" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <a href="#" onclick="if(confirm('Are you sure you want to log out?')) { document.getElementById('logoutForm').submit(); } return false;">
+                        <i class="fa fa-right-from-bracket"></i> Logout
+                    </a>
+                </form>
+            }
+            else
+            {
+                <a href="@Url.Action("Login", "Account")">Log in</a>
+                <a href="@Url.Action("Register", "Account")" class="nav-cta">Get Started</a>
+            }
+        </div>
+    </nav>
+
+    @* ── Flash messages ───────────────────────────────────────────── *@
+    <div class="page-body">
+        @if (TempData["Success"] != null)
+        {
+            <div class="flash-bar flash-success">
+                <i class="fa fa-circle-check"></i> @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="flash-bar flash-error">
+                <i class="fa fa-circle-exclamation"></i> @TempData["Error"]
+            </div>
+        }
+        @if (TempData["Info"] != null)
+        {
+            <div class="flash-bar flash-info">
+                <i class="fa fa-circle-info"></i> @TempData["Info"]
+            </div>
+        }
+
+        @RenderBody()
+    </div>
+
+    @* ── Footer ───────────────────────────────────────────────────── *@
+    <footer class="srr-footer">
+        <span>&copy; @DateTime.Now.Year EcoRewards SA &mdash; eThekwini, KwaZulu-Natal</span>
+        &nbsp;·&nbsp;
+        <span>Built by DUT Application Development students</span>
+    </footer>
+
+    @* Scripts *@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

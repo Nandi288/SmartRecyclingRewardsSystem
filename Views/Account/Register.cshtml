@@ -1,0 +1,556 @@
+﻿@model SmartRecyclingRewardsSystem.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Create Account";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .auth-page {
+            min-height: calc(100vh - 64px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 16px;
+            background: var(--offwhite);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 540px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 32px rgba(26,58,42,0.08);
+        }
+
+        .auth-header {
+            background: var(--green-deep);
+            padding: 32px 36px 28px;
+            text-align: center;
+        }
+
+            .auth-header .brand-icon {
+                width: 48px;
+                height: 48px;
+                background: var(--lime);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 22px;
+                color: var(--green-deep);
+                margin: 0 auto 14px;
+            }
+
+            .auth-header h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 22px;
+                font-weight: 700;
+                color: #fff;
+                margin-bottom: 4px;
+            }
+
+            .auth-header p {
+                font-size: 13px;
+                color: rgba(255,255,255,0.55);
+                margin: 0;
+            }
+
+        .auth-body {
+            padding: 32px 36px 36px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-dark);
+                margin-bottom: 7px;
+            }
+
+                .form-group label .optional {
+                    font-weight: 400;
+                    color: var(--text-muted);
+                    font-size: 12px;
+                }
+
+        .form-control-srr {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #d1d9d4;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+            .form-control-srr:focus {
+                border-color: var(--green-mid);
+                box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+            }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+            .input-icon-wrap .form-control-srr {
+                padding-left: 40px;
+            }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        .toggle-pw {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+            .toggle-pw:hover {
+                color: var(--green-mid);
+            }
+
+        /* ── Role selector cards ──────────────────────────────────── */
+        .role-section-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .role-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .role-card input[type="radio"] {
+            display: none;
+        }
+
+        .role-card-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 18px 12px;
+            border: 2px solid #d1d9d4;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            text-align: center;
+        }
+
+            .role-card-label:hover {
+                border-color: var(--green-bright);
+                background: #f0faf4;
+            }
+
+        /* When the hidden radio is checked, style the label */
+        .role-card input[type="radio"]:checked + .role-card-label {
+            border-color: var(--green-mid);
+            background: #edf7f1;
+        }
+
+        .role-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #f0faf4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--green-mid);
+            transition: background 0.2s;
+        }
+
+        .role-card input[type="radio"]:checked + .role-card-label .role-card-icon {
+            background: var(--green-mid);
+            color: #fff;
+        }
+
+        .role-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .role-card-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* ── Notifications checkboxes ─────────────────────────────── */
+        .notif-section {
+            background: #f8fdf9;
+            border: 1px solid #d4edda;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .notif-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 8px;
+        }
+
+            .check-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .check-row input[type="checkbox"] {
+                width: 16px;
+                height: 16px;
+                accent-color: var(--green-mid);
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .check-row label {
+                font-size: 13px;
+                color: var(--text-dark);
+                cursor: pointer;
+                margin: 0;
+            }
+
+                .check-row label span {
+                    font-size: 11px;
+                    color: var(--text-muted);
+                    display: block;
+                }
+
+        .btn-auth {
+            width: 100%;
+            background: var(--green-mid);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: background 0.2s, transform 0.15s;
+            margin-bottom: 20px;
+        }
+
+            .btn-auth:hover {
+                background: #245c42;
+                transform: translateY(-1px);
+            }
+
+        .auth-divider {
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+            .auth-divider a {
+                color: var(--green-mid);
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .auth-divider a:hover {
+                    text-decoration: underline;
+                }
+
+        .section-sep {
+            border: none;
+            border-top: 1px solid #e8f0eb;
+            margin: 22px 0;
+        }
+
+        .validation-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #991b1b;
+            margin-bottom: 20px;
+        }
+
+        @@media (max-width: 480px) {
+            .auth-body {
+                padding: 24px 20px 28px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .auth-header {
+                padding: 24px 20px 20px;
+            }
+        }
+    </style>
+}
+
+<div class="auth-page">
+    <div class="auth-card">
+
+        <div class="auth-header">
+            <div class="brand-icon"><i class="fa fa-leaf"></i></div>
+            <h1>Create your account</h1>
+            <p>Join EcoRewards SA and start earning points for recycling</p>
+        </div>
+
+        <div class="auth-body">
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-error">
+                    <i class="fa fa-circle-exclamation"></i>
+                    @Html.ValidationSummary(true)
+                </div>
+            }
+
+            @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @* ── Name row ──────────────────────────────────────── *@
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-user input-icon"></i>
+                            @Html.TextBoxFor(m => m.FirstName, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "Sipho"
+                            })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "text-danger", style = "font-size:12px" })
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-user input-icon"></i>
+                            @Html.TextBoxFor(m => m.LastName, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "Dlamini"
+                            })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "text-danger", style = "font-size:12px" })
+                    </div>
+                </div>
+
+                @* ── Email ─────────────────────────────────────────── *@
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa fa-envelope input-icon"></i>
+                        @Html.TextBoxFor(m => m.Email, new
+                        {
+                            @class = "form-control-srr",
+                            placeholder = "you@example.com",
+                            type = "email"
+                        })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger", style = "font-size:12px" })
+                </div>
+
+                @* ── Password row ──────────────────────────────────── *@
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-lock input-icon"></i>
+                            @Html.PasswordFor(m => m.Password, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "Min. 6 characters",
+                                id = "pw1"
+                            })
+                            <button type="button" class="toggle-pw" onclick="togglePw('pw1','icon1')">
+                                <i class="fa fa-eye" id="icon1"></i>
+                            </button>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger", style = "font-size:12px" })
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-lock input-icon"></i>
+                            @Html.PasswordFor(m => m.ConfirmPassword, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "Repeat password",
+                                id = "pw2"
+                            })
+                            <button type="button" class="toggle-pw" onclick="togglePw('pw2','icon2')">
+                                <i class="fa fa-eye" id="icon2"></i>
+                            </button>
+                        </div>
+                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger", style = "font-size:12px" })
+                    </div>
+                </div>
+
+                @* ── Address row (optional) ────────────────────────── *@
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Address <span class="optional">(optional)</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-map-pin input-icon"></i>
+                            @Html.TextBoxFor(m => m.Address, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "123 Main Road"
+                            })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>City <span class="optional">(optional)</span></label>
+                        <div class="input-icon-wrap">
+                            <i class="fa fa-city input-icon"></i>
+                            @Html.TextBoxFor(m => m.City, new
+                            {
+                                @class = "form-control-srr",
+                                placeholder = "Durban"
+                            })
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="section-sep" />
+
+                @* ── Role selector ─────────────────────────────────── *@
+                <span class="role-section-label">I am registering as a</span>
+
+                <div class="role-cards">
+                    @* Resident card *@
+                    <div class="role-card">
+                        <input type="radio" name="Role" id="roleResident"
+                               value="Resident" checked="checked" />
+                        <label class="role-card-label" for="roleResident">
+                            <div class="role-card-icon">
+                                <i class="fa fa-house"></i>
+                            </div>
+                            <span class="role-card-title">Resident</span>
+                            <span class="role-card-desc">
+                                I am a community member who wants to log recycling and earn points
+                            </span>
+                        </label>
+                    </div>
+
+                    @* Collection Officer card *@
+                    <div class="role-card">
+                        <input type="radio" name="Role" id="roleOfficer"
+                               value="CollectionOfficer" />
+                        <label class="role-card-label" for="roleOfficer">
+                            <div class="role-card-icon">
+                                <i class="fa fa-shield-halved"></i>
+                            </div>
+                            <span class="role-card-title">Collection Officer</span>
+                            <span class="role-card-desc">
+                                I work at a drop-off point and verify recycling submissions
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                @Html.ValidationMessageFor(m => m.Role, "", new { @class = "text-danger", style = "font-size:12px" })
+
+                <hr class="section-sep" />
+
+                @* ── Notification preferences ──────────────────────── *@
+                <div class="notif-section">
+                    <span class="notif-label">
+                        <i class="fa fa-bell fa-xs"></i> &nbsp;Notification preferences
+                    </span>
+                    <div class="check-row">
+                        @Html.CheckBoxFor(m => m.ReceiveEmailNotifications, new { id = "emailNotif" })
+                        <label for="emailNotif">
+                            Email notifications
+                            <span>Get emailed when your submission is verified or rejected</span>
+                        </label>
+                    </div>
+                    <div class="check-row">
+                        @Html.CheckBoxFor(m => m.ReceiveSmsNotifications, new { id = "smsNotif" })
+                        <label for="smsNotif">
+                            SMS notifications
+                            <span>Get an SMS sent to your phone number (via Clickatell)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-auth">
+                    <i class="fa fa-leaf"></i> Create Account
+                </button>
+            }
+
+            <div class="auth-divider">
+                Already have an account?
+                <a href="@Url.Action("Login", "Account")">Log in here</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>function togglePw(fieldId, iconId) {
+        var f = document.getElementById(fieldId);
+        var i = document.getElementById(iconId);
+        if (f.type === 'password') {
+            f.type = 'text';
+            i.className = 'fa fa-eye-slash';
+        } else {
+            f.type = 'password';
+            i.className = 'fa fa-eye';
+        }
+    }</script>
+}

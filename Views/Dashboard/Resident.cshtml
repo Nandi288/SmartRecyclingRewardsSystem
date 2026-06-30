@@ -1,0 +1,465 @@
+﻿@{
+    ViewBag.Title = "My Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = ViewBag.User as SmartRecyclingRewardsSystem.Models.ApplicationUser;
+    var recentSubmissions = ViewBag.RecentSubmissions as List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>;
+    var recentNotifications = ViewBag.RecentNotifications as List<SmartRecyclingRewardsSystem.Models.Notification>;
+}
+
+@section styles {
+    <style>
+        .dash-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .dash-hello {
+            margin-bottom: 28px;
+        }
+
+            .dash-hello h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--green-deep);
+            }
+
+            .dash-hello p {
+                color: var(--text-muted);
+                font-size: 14px;
+                margin-top: 4px;
+            }
+
+        /* Stat cards row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            padding: 20px 20px 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Syne',sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--green-deep);
+            line-height: 1;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-icon {
+            float: right;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .icon-lime {
+            background: #f3fcd4;
+            color: #5a7a00;
+        }
+
+        .icon-green {
+            background: #edf7f1;
+            color: var(--green-mid);
+        }
+
+        .icon-blue {
+            background: #e8f4fd;
+            color: #1a6fa8;
+        }
+
+        .icon-amber {
+            background: #fef9c3;
+            color: #92620a;
+        }
+
+        /* Two-col layout */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        /* Section card */
+        .section-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .section-head h2 {
+                font-family: 'Syne',sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+            .section-head a {
+                font-size: 13px;
+                color: var(--green-mid);
+                text-decoration: none;
+                font-weight: 500;
+            }
+
+                .section-head a:hover {
+                    text-decoration: underline;
+                }
+
+        .section-body {
+            padding: 0;
+        }
+
+        /* Submissions table */
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .sub-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 10px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .sub-table td {
+                padding: 12px 16px;
+                font-size: 13px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+            }
+
+            .sub-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-verified {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Notifications list */
+        .notif-list {
+            padding: 0;
+        }
+
+        .notif-item {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .notif-item:last-child {
+                border-bottom: none;
+            }
+
+            .notif-item.unread {
+                background: #f8fdf9;
+            }
+
+        .notif-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+
+        .notif-msg {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .notif-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .notif-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--lime);
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+
+        /* Quick action buttons */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .quick-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 10px;
+            background: #f8fdf9;
+            border: 1px solid #d4edda;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--green-mid);
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+            .quick-btn:hover {
+                background: #edf7f1;
+                color: var(--green-mid);
+            }
+
+            .quick-btn i {
+                font-size: 20px;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+            .empty-state i {
+                font-size: 28px;
+                margin-bottom: 8px;
+                display: block;
+            }
+
+        @@media(max-width:768px) {
+            .stats-row {
+                grid-template-columns: repeat(2,1fr);
+            }
+
+            .dash-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media(max-width:480px) {
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+}
+
+<div class="dash-wrap">
+
+    <div class="dash-hello">
+        <h1>Welcome back, @user.FirstName 👋</h1>
+        <p>Here's your recycling activity at a glance.</p>
+    </div>
+
+    @* ── Stat cards ──────────────────────────────────────────── *@
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon icon-lime"><i class="fa fa-star"></i></div>
+            <div class="stat-label">Points Balance</div>
+            <div class="stat-value">@user.PointsBalance</div>
+            <div class="stat-sub">@ViewBag.TotalEarned pts earned total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green"><i class="fa fa-weight-hanging"></i></div>
+            <div class="stat-label">Total Recycled</div>
+            <div class="stat-value">@string.Format("{0:0.#}", ViewBag.TotalWeight)<small style="font-size:16px;font-weight:500"> kg</small></div>
+            <div class="stat-sub">across all materials</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-blue"><i class="fa fa-leaf"></i></div>
+            <div class="stat-label">CO₂ Saved</div>
+            <div class="stat-value">@string.Format("{0:0.##}", ViewBag.TotalCo2)<small style="font-size:16px;font-weight:500"> kg</small></div>
+            <div class="stat-sub">equivalent CO₂ offset</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-amber"><i class="fa fa-ranking-star"></i></div>
+            <div class="stat-label">Leaderboard Rank</div>
+            <div class="stat-value">#@ViewBag.Rank</div>
+            <div class="stat-sub">@ViewBag.PendingCount submission(s) pending</div>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+
+        @* Left column *@
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+            @* Quick actions *@
+            <div class="section-card">
+                <div class="section-head">
+                    <h2><i class="fa fa-bolt fa-sm"></i> Quick Actions</h2>
+                </div>
+                <div class="quick-actions">
+                    <a href="@Url.Action("Create","RecyclingSubmission")" class="quick-btn">
+                        <i class="fa fa-plus-circle"></i> Log Recycling
+                    </a>
+                    <a href="@Url.Action("Index","PointTransaction")" class="quick-btn">
+                        <i class="fa fa-clock-rotate-left"></i> Points History
+                    </a>
+                    <a href="@Url.Action("Index","Leaderboard")" class="quick-btn">
+                        <i class="fa fa-ranking-star"></i> Leaderboard
+                    </a>
+                    <a href="@Url.Action("Impact","Resident")" class="quick-btn">
+                        <i class="fa fa-leaf"></i> My Impact
+                    </a>
+                </div>
+            </div>
+
+            @* Recent submissions *@
+            <div class="section-card">
+                <div class="section-head">
+                    <h2>Recent Submissions</h2>
+                    <a href="@Url.Action("Index","RecyclingSubmission")">View all</a>
+                </div>
+                <div class="section-body">
+                    @if (recentSubmissions != null && recentSubmissions.Count > 0)
+                    {
+                        <table class="sub-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Material</th>
+                                    <th>Weight</th>
+                                    <th>Status</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in recentSubmissions)
+                                {
+                                    <tr>
+                                        <td>@s.SubmissionDate.ToString("dd MMM yyyy")</td>
+                                        <td>@s.MaterialType.Name</td>
+                                        <td>@s.WeightKg kg</td>
+                                        <td>
+                                            @if (s.Status == SmartRecyclingRewardsSystem.Models.SubmissionStatus.Pending)
+                                            {<span class="badge-pill badge-pending"><i class="fa fa-clock fa-xs"></i> Pending</span> }
+                                            else if (s.Status == SmartRecyclingRewardsSystem.Models.SubmissionStatus.Verified)
+                                            { <span class="badge-pill badge-verified"><i class="fa fa-check fa-xs"></i> Verified</span> }
+                                            else
+                                            { <span class="badge-pill badge-rejected"><i class="fa fa-xmark fa-xs"></i> Rejected</span>}
+                                        </td>
+                                        <td>@(s.PointsAwarded > 0 ? "+" + s.PointsAwarded : "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fa fa-recycle"></i>
+                            No submissions yet. <a href="@Url.Action("Create","RecyclingSubmission")">Log your first one!</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* Right column — notifications *@
+        <div class="section-card" style="align-self:start;">
+            <div class="section-head">
+                <h2>
+                    <i class="fa fa-bell fa-sm"></i> Notifications
+                    @if ((int)ViewBag.UnreadCount > 0)
+                    {<span style="background:#ef4444;color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;">@ViewBag.UnreadCount</span>}
+                </h2>
+                <a href="@Url.Action("Index","Notification")">View all</a>
+            </div>
+            <div class="notif-list">
+                @if (recentNotifications != null && recentNotifications.Count > 0)
+                {
+                    foreach (var n in recentNotifications)
+                    {
+                        <div class="notif-item @(!n.IsRead ? "unread" : "")">
+                            <div style="display:flex;gap:8px;">
+                                @if (!n.IsRead)
+                                {<div class="notif-dot"></div>}
+                                <div>
+                                    <div class="notif-title">@n.Title</div>
+                                    <div class="notif-msg">@n.Message</div>
+                                    <div class="notif-time">@n.CreatedAt.ToString("dd MMM, HH:mm")</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <i class="fa fa-bell-slash"></i>
+                        No notifications yet.
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,369 @@
+﻿@{
+    ViewBag.Title = "Officer Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = ViewBag.User as SmartRecyclingRewardsSystem.Models.ApplicationUser;
+    var pendingSubmissions = ViewBag.PendingSubmissions as List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>;
+    var assignedPoints = ViewBag.AssignedPoints as List<SmartRecyclingRewardsSystem.Models.DropOffPoint>;
+}
+
+@section styles {
+    <style>
+        .dash-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .dash-hello h1 {
+            font-family: 'Syne',sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--green-deep);
+        }
+
+        .dash-hello p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 28px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Syne',sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--green-deep);
+        }
+
+        .stat-icon {
+            float: right;
+            width: 38px;
+            height: 38px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .icon-amber {
+            background: #fef9c3;
+            color: #92620a;
+        }
+
+        .icon-green {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .icon-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .icon-blue {
+            background: #e8f4fd;
+            color: #1a6fa8;
+        }
+
+        .section-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .section-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+            .section-head h2 {
+                font-family: 'Syne',sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .sub-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 10px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .sub-table td {
+                padding: 12px 16px;
+                font-size: 13px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+                vertical-align: middle;
+            }
+
+            .sub-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-verify {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-verify:hover {
+                background: #bbf7d0;
+                color: #166534;
+            }
+
+        .btn-reject {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .btn-reject:hover {
+                background: #fecaca;
+                color: #991b1b;
+            }
+
+        .points-list {
+            padding: 14px 20px;
+        }
+
+        .point-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .point-item:last-child {
+                border-bottom: none;
+            }
+
+        .point-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--lime);
+            flex-shrink: 0;
+        }
+
+        .point-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .point-city {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+            .empty-state i {
+                font-size: 32px;
+                margin-bottom: 10px;
+                display: block;
+                color: var(--green-bright);
+            }
+
+        @@media(max-width:768px) {
+            .stats-row {
+                grid-template-columns: repeat(2,1fr);
+            }
+        }
+    </style>
+}
+
+<div class="dash-wrap">
+
+    <div class="dash-hello">
+        <h1>Officer Dashboard</h1>
+        <p>Welcome, @user.FirstName. Here are the submissions waiting for your review.</p>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon icon-amber"><i class="fa fa-clock"></i></div>
+            <div class="stat-label">Pending</div>
+            <div class="stat-value">@ViewBag.PendingCount</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-green"><i class="fa fa-circle-check"></i></div>
+            <div class="stat-label">Total Verified</div>
+            <div class="stat-value">@ViewBag.TotalVerified</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-red"><i class="fa fa-circle-xmark"></i></div>
+            <div class="stat-label">Total Rejected</div>
+            <div class="stat-value">@ViewBag.TotalRejected</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon icon-blue"><i class="fa fa-calendar-day"></i></div>
+            <div class="stat-label">Verified Today</div>
+            <div class="stat-value">@ViewBag.TodayVerified</div>
+        </div>
+    </div>
+
+    @* Assigned drop-off points *@
+    @if (assignedPoints != null && assignedPoints.Count > 0)
+    {
+        <div class="section-card">
+            <div class="section-head">
+                <h2><i class="fa fa-location-dot fa-sm"></i> Your Assigned Drop-Off Points</h2>
+            </div>
+            <div class="points-list">
+                @foreach (var p in assignedPoints)
+                {
+                    <div class="point-item">
+                        <div class="point-dot"></div>
+                        <div>
+                            <div class="point-name">@p.Name</div>
+                            <div class="point-city">@p.Address &mdash; @p.OperatingHours</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @* Pending submissions *@
+    <div class="section-card">
+        <div class="section-head">
+            <h2><i class="fa fa-hourglass-half fa-sm"></i> Pending Submissions</h2>
+            <a href="@Url.Action("Pending","RecyclingSubmission")" style="font-size:13px;color:var(--green-mid);text-decoration:none;font-weight:500;">View all</a>
+        </div>
+
+        @if (pendingSubmissions != null && pendingSubmissions.Count > 0)
+        {
+            <table class="sub-table">
+                <thead>
+                    <tr>
+                        <th>Resident</th>
+                        <th>Material</th>
+                        <th>Weight</th>
+                        <th>Drop-Off Point</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in pendingSubmissions)
+                    {
+                        <tr>
+                            <td><strong>@s.Resident.FullName</strong><br /><small style="color:var(--text-muted);">@s.Resident.Email</small></td>
+                            <td>@s.MaterialType.Name</td>
+                            <td>@s.WeightKg kg</td>
+                            <td>@s.DropOffPoint.Name</td>
+                            <td>@s.SubmissionDate.ToString("dd MMM, HH:mm")</td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="@Url.Action("Verify","RecyclingSubmission", new { id = s.RecyclingSubmissionId })"
+                                       class="btn-verify">
+                                        <i class="fa fa-check fa-xs"></i> Verify
+                                    </a>
+                                    <a href="@Url.Action("Reject","RecyclingSubmission", new { id = s.RecyclingSubmissionId })"
+                                       class="btn-reject">
+                                        <i class="fa fa-xmark fa-xs"></i> Reject
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fa fa-circle-check"></i>
+                All caught up — no pending submissions right now.
+            </div>
+        }
+    </div>
+
+</div>
