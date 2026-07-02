@@ -13,10 +13,8 @@ namespace SmartRecyclingRewardsSystem.Data
         {
             SeedRoles(context);
             SeedAdminUser(context);
-            SeedMaterialTypes(context);
             SeedBadges(context);
             SeedSystemConfig(context);
-            SeedDropOffPoints(context);
 
             base.Seed(context);
         }
@@ -34,7 +32,6 @@ namespace SmartRecyclingRewardsSystem.Data
             }
         }
 
-        // Email: admin@smartrecycling.co.za / Password: Admin@123
         private void SeedAdminUser(ApplicationDbContext context)
         {
             var userStore = new UserStore<ApplicationUser>(context);
@@ -64,18 +61,6 @@ namespace SmartRecyclingRewardsSystem.Data
             }
         }
 
-        private void SeedMaterialTypes(ApplicationDbContext context)
-        {
-            context.MaterialTypes.AddOrUpdate(m => m.Name,
-                new MaterialType { Name = "Paper", PointsPerKg = 3m, CO2SavingPerKg = 1.0842m, ColourCode = "#f59e0b", IsActive = true },
-                new MaterialType { Name = "Plastic", PointsPerKg = 4m, CO2SavingPerKg = 1.5300m, ColourCode = "#3b82f6", IsActive = true },
-                new MaterialType { Name = "Glass", PointsPerKg = 5m, CO2SavingPerKg = 0.3140m, ColourCode = "#10b981", IsActive = true },
-                new MaterialType { Name = "Metal", PointsPerKg = 7m, CO2SavingPerKg = 4.0000m, ColourCode = "#6b7280", IsActive = true },
-                new MaterialType { Name = "E-Waste", PointsPerKg = 10m, CO2SavingPerKg = 2.5000m, ColourCode = "#ef4444", IsActive = true }
-            );
-            context.SaveChanges();
-        }
-
         private void SeedBadges(ApplicationDbContext context)
         {
             context.Badges.AddOrUpdate(b => b.Name,
@@ -91,32 +76,62 @@ namespace SmartRecyclingRewardsSystem.Data
         private void SeedSystemConfig(ApplicationDbContext context)
         {
             context.SystemConfigs.AddOrUpdate(s => s.Key,
-                new SystemConfig { Key = "AppName", Value = "EcoRewards SA", Description = "Application display name" },
-                new SystemConfig { Key = "AppTagline", Value = "Recycle. Earn. Repeat.", Description = "Tagline shown on landing page" },
-                new SystemConfig { Key = "MinRedemptionPoints", Value = "100", Description = "Minimum points needed to redeem a reward" },
-                new SystemConfig { Key = "StreakBonusPoints", Value = "20", Description = "Bonus points for a 5-week recycling streak" },
-                new SystemConfig { Key = "SmtpHost", Value = "smtp.gmail.com", Description = "SMTP server host" },
-                new SystemConfig { Key = "SmtpPort", Value = "587", Description = "SMTP server port" },
-                new SystemConfig { Key = "SmtpFromEmail", Value = "noreply@ecorewardssa.co.za", Description = "From address for outgoing emails" },
-                new SystemConfig { Key = "ClickatellApiKey", Value = "", Description = "Clickatell API key for SMS notifications" }
-            );
-            context.SaveChanges();
-        }
-
-        private void SeedDropOffPoints(ApplicationDbContext context)
-        {
-            context.DropOffPoints.AddOrUpdate(d => d.Name,
-                new DropOffPoint { Name = "North Coast Road Buy-Back Centre", Address = "1288 North Coast Road, Redhill, Durban", City = "Durban", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Westmead Buy-Back Centre", Address = "39 Westmead Road, Westmead, Pinetown", City = "Pinetown", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Lorne Street Buy-Back Centre", Address = "Lorne Street, Warwick Junction, Durban", City = "Durban", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Brook Street Buy-Back Centre", Address = "Brook Street, Durban CBD", City = "Durban", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "New Germany Buy-Back Centre", Address = "Escom Road, New Germany, Durban", City = "New Germany", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "KwaMashu Buy-Back Centre", Address = "Opposite Metrorail Station, KwaMashu", City = "KwaMashu", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Isipingo Buy-Back Centre", Address = "1029 Old Main Road, Isipingo", City = "Isipingo", OperatingHours = "Mon-Fri 07:00-16:30 | Sat 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Nyati Road Garden Drop-Off Site", Address = "1 Nyati Road, Athlone Park, Amanzimtoti", City = "Amanzimtoti", OperatingHours = "Mon-Fri 07:00-16:30 | Sat-Sun 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Mariannhill Landfill & Recycling Site", Address = "1 Landfill Lane, Mariannhill", City = "Mariannhill", OperatingHours = "Mon-Fri 07:00-16:30 | Sat-Sun 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "Bisasar Road Recycling Centre", Address = "1 Dhulam Road, Springfield, Durban", City = "Springfield", OperatingHours = "Mon-Fri 07:00-16:30 | Sat-Sun 07:00-15:30", IsActive = true },
-                new DropOffPoint { Name = "EWaste Africa – Ladysmith Drop-Off", Address = "Cnr Francis & Hunter St, San Marco Centre, Ladysmith", City = "Ladysmith", OperatingHours = "Mon-Fri 08:00-17:00", IsActive = true }
+                new SystemConfig
+                {
+                    Key = "AppName",
+                    Value = "EcoRewards SA",
+                    Description = "Application display name",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "AppTagline",
+                    Value = "Recycle. Earn. Repeat.",
+                    Description = "Tagline shown on landing page",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "MinRedemptionPoints",
+                    Value = "100",
+                    Description = "Minimum points needed to redeem a reward",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "StreakBonusPoints",
+                    Value = "20",
+                    Description = "Bonus points for a 5-week recycling streak",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "SmtpHost",
+                    Value = "smtp.gmail.com",
+                    Description = "SMTP server host",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "SmtpPort",
+                    Value = "587",
+                    Description = "SMTP server port",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "SmtpFromEmail",
+                    Value = "noreply@ecorewardssa.co.za",
+                    Description = "From address for outgoing emails",
+                    LastUpdated = DateTime.Now
+                },
+                new SystemConfig
+                {
+                    Key = "ClickatellApiKey",
+                    Value = "",
+                    Description = "Clickatell API key for SMS notifications",
+                    LastUpdated = DateTime.Now
+                }
             );
             context.SaveChanges();
         }

@@ -335,8 +335,8 @@
                 if (User.IsInRole("Resident"))
                 {
                     <span class="role-pill resident"><i class="fa fa-house fa-xs"></i> Resident</span>
-                    <a href="@Url.Action("Create", "RecyclingSubmission")"><i class="fa fa-plus"></i> Log Recycling</a>
-                    <a href="@Url.Action("Index", "RecyclingSubmission")">My Submissions</a>
+                    <a href="/Recycle/Log"><i class="fa fa-plus"></i> Log Recycling</a>
+                    <a href="/Recycle/MySubmissions">My Submissions</a>
                     <a href="@Url.Action("Index", "PointTransaction")">Points</a>
                     <a href="@Url.Action("Index", "Leaderboard")">Leaderboard</a>
                 }
@@ -412,7 +412,10 @@
     </footer>
 
     @* Scripts *@
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

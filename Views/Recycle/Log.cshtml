@@ -1,0 +1,70 @@
+﻿@model SmartRecyclingRewardsSystem.Models.RecyclingSubmission
+
+@{
+    ViewBag.Title = "Log Recycling";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="max-width:600px;margin:0 auto;padding:32px 20px 60px;">
+
+    <h2 style="font-family:'Syne',sans-serif;margin-bottom:20px;">Log Recycling Activity</h2>
+
+    <div style="background:#f8fdf9;border:1px solid #d4edda;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:13px;color:#6b7c6e;">
+        <i class="fa fa-circle-info"></i> Your submission will be reviewed before points are awarded.
+    </div>
+
+    <form action="/Recycle/Log" method="post" style="background:#fff;padding:24px;border-radius:12px;border:1px solid #eee;">
+
+        @Html.AntiForgeryToken()
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div style="background:#fdecea;border:1px solid #f5c2c0;border-radius:8px;padding:12px 16px;margin-bottom:16px;color:#a94442;font-size:13px;">
+                @Html.ValidationSummary(false)
+            </div>
+        }
+
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Material Type *</label>
+            <select name="MaterialTypeId" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;">
+                <option value="">-- Select Material --</option>
+                @foreach (var item in ViewBag.MaterialTypeId as SelectList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Drop-Off Point *</label>
+            <select name="DropOffPointId" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;">
+                <option value="">-- Select Drop-Off Point --</option>
+                @foreach (var item in ViewBag.DropOffPointId as SelectList)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Weight (kg) *</label>
+            <input type="number" name="WeightKg" step="0.01" min="0.01" placeholder="e.g. 2.5" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;" />
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block;font-weight:600;font-size:13px;margin-bottom:4px;">Notes (optional)</label>
+            <textarea name="Notes" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:14px;min-height:80px;font-family:'Inter',sans-serif;" placeholder="Any additional details..."></textarea>
+        </div>
+
+        <div>
+            <button type="submit" style="background:#2d6a4f;color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;">
+                <i class="fa fa-leaf"></i> Submit Recycling
+            </button>
+            <a href="/Dashboard/Resident" style="background:transparent;color:#6b7c6e;border:1px solid #ccc;border-radius:8px;padding:13px 28px;font-size:14px;text-decoration:none;display:inline-block;margin-left:10px;">
+                Cancel
+            </a>
+        </div>
+
+    </form>
+
+</div>

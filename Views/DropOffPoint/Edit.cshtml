@@ -1,0 +1,220 @@
+﻿@model SmartRecyclingRewardsSystem.Models.DropOffPoint
+
+@{
+    ViewBag.Title = "Edit Drop-Off Point";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .page-header-simple {
+            margin-bottom: 28px;
+        }
+
+            .page-header-simple h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--green-deep);
+            }
+
+            .page-header-simple p {
+                color: var(--text-muted);
+                font-size: 14px;
+                margin-top: 4px;
+            }
+
+        .form-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-dark);
+                margin-bottom: 6px;
+            }
+
+                .form-group label .required {
+                    color: #ef4444;
+                }
+
+        .form-control-srr {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #d1d9d4;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+
+            .form-control-srr:focus {
+                border-color: var(--green-mid);
+                box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+            }
+
+        .text-danger {
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-submit {
+            background: var(--green-mid);
+            color: #fff;
+            border: none;
+            border-radius: 9px;
+            padding: 13px 32px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+            .btn-submit:hover {
+                background: #245c42;
+            }
+
+        .btn-cancel {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid #d1d9d4;
+            border-radius: 9px;
+            padding: 13px 28px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn-cancel:hover {
+                background: #f5f5f5;
+                border-color: #b0b0b0;
+                text-decoration: none;
+                color: var(--text-muted);
+            }
+
+        .validation-summary {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .checkbox-group input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                accent-color: var(--green-mid);
+            }
+
+            .checkbox-group label {
+                margin: 0;
+                font-weight: 400;
+            }
+    </style>
+}
+
+<div class="page-wrap">
+    <div class="page-header-simple">
+        <h1>Edit Drop-Off Point</h1>
+        <p>Update the drop-off location details.</p>
+    </div>
+
+    <div class="form-card">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="validation-summary">
+                <i class="fa fa-circle-exclamation"></i>
+                @Html.ValidationSummary(true)
+            </div>
+        }
+
+        @using (Html.BeginForm("Edit", "DropOffPoint", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.DropOffPointId)
+
+            <div class="form-group">
+                <label for="Name">Location Name <span class="required">*</span></label>
+                @Html.TextBoxFor(m => m.Name, new { @class = "form-control-srr" })
+                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="Address">Address <span class="required">*</span></label>
+                @Html.TextBoxFor(m => m.Address, new { @class = "form-control-srr" })
+                @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="City">City <span class="required">*</span></label>
+                @Html.TextBoxFor(m => m.City, new { @class = "form-control-srr" })
+                @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="OperatingHours">Operating Hours <span class="required">*</span></label>
+                @Html.TextBoxFor(m => m.OperatingHours, new { @class = "form-control-srr" })
+                @Html.ValidationMessageFor(m => m.OperatingHours, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <label for="AssignedOfficerId">Assigned Collection Officer</label>
+                @Html.DropDownListFor(
+                    m => m.AssignedOfficerId,
+                    (SelectList)ViewBag.AssignedOfficerId,
+                    "-- Select Officer --",
+                    new { @class = "form-control-srr" }
+                )
+                @Html.ValidationMessageFor(m => m.AssignedOfficerId, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    @Html.CheckBoxFor(m => m.IsActive)
+                    <label for="IsActive">Active (visible to Residents)</label>
+                </div>
+                @Html.ValidationMessageFor(m => m.IsActive, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-submit"><i class="fa fa-save"></i> Update Drop-Off Point</button>
+                <a href="@Url.Action("Index")" class="btn-cancel"><i class="fa fa-xmark"></i> Cancel</a>
+            </div>
+        }
+    </div>
+</div>
