@@ -207,8 +207,10 @@
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DropOffPointController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\ImpactController.cs" />
     <Compile Include="Controllers\MaterialTypeController.cs" />
     <Compile Include="Controllers\RecycleController.cs" />
+    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Data\ApplicationDbInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -309,6 +311,8 @@
     <Content Include="Views\DropOffPoint\Delete.cshtml" />
     <Content Include="Views\Recycle\Log.cshtml" />
     <Content Include="Views\Recycle\MySubmissions.cshtml" />
+    <Content Include="Views\Impact\Index.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
