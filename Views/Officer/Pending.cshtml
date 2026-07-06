@@ -1,0 +1,308 @@
+﻿@using SmartRecyclingRewardsSystem.Models
+@model List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>
+@{
+    ViewBag.Title = "Pending Submissions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .page-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .page-top h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 24px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+            .page-top a {
+                color: var(--green-mid);
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+                .page-top a:hover {
+                    text-decoration: underline;
+                }
+
+        .count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .sub-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .sub-card-head {
+            padding: 16px 20px;
+            background: #f8fdf9;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sub-resident {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--green-deep);
+        }
+
+        .sub-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .sub-card-body {
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 16px;
+        }
+
+        .sub-field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .sub-field-value {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .sub-card-footer {
+            padding: 14px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sub-notes {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .btn-verify {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 9px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: background 0.2s;
+        }
+
+            .btn-verify:hover {
+                background: #bbf7d0;
+            }
+
+        .reject-form {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .reject-input {
+            padding: 9px 12px;
+            border: 1.5px solid #fecaca;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: 'Inter',sans-serif;
+            color: var(--text-dark);
+            outline: none;
+            width: 260px;
+        }
+
+            .reject-input:focus {
+                border-color: #ef4444;
+                box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+            }
+
+        .btn-reject {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: background 0.2s;
+        }
+
+            .btn-reject:hover {
+                background: #fecaca;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+            .empty-state i {
+                font-size: 40px;
+                color: var(--green-bright);
+                margin-bottom: 12px;
+                display: block;
+            }
+
+        @@media(max-width:768px) {
+            .sub-card-body {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .reject-input {
+                width: 100%;
+            }
+        }
+    </style>
+}
+
+<div class="page-wrap">
+    <div class="page-top">
+        <h1><i class="fa fa-hourglass-half" style="color:var(--green-mid);margin-right:8px;"></i> Pending Submissions</h1>
+        <a href="@Url.Action("AllSubmissions","Officer")">
+            <i class="fa fa-list fa-xs"></i> View All Submissions
+        </a>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="count-badge">
+            <i class="fa fa-clock fa-xs"></i>
+            @Model.Count pending submission(s) waiting for your review
+        </div>
+
+        foreach (var s in Model)
+        {
+            <div class="sub-card">
+                <div class="sub-card-head">
+                    <div>
+                        <div class="sub-resident"><i class="fa fa-user fa-xs"></i> @s.Resident.FullName</div>
+                        <div class="sub-date">@s.Resident.Email</div>
+                    </div>
+                    <div class="sub-date">Submitted @s.SubmissionDate.ToString("dd MMM yyyy, HH:mm")</div>
+                </div>
+
+                <div class="sub-card-body">
+                    <div>
+                        <div class="sub-field-label">Material</div>
+                        <div class="sub-field-value">@s.MaterialType.Name</div>
+                    </div>
+                    <div>
+                        <div class="sub-field-label">Weight</div>
+                        <div class="sub-field-value">@s.WeightKg kg</div>
+                    </div>
+                    <div>
+                        <div class="sub-field-label">Drop-Off Point</div>
+                        <div class="sub-field-value">@s.DropOffPoint.Name</div>
+                    </div>
+                    <div>
+                        <div class="sub-field-label">Est. Points</div>
+                        <div class="sub-field-value" style="color:var(--green-mid);font-weight:700;">
+                            ~@((int)Math.Floor(s.WeightKg * s.MaterialType.PointsPerKg)) pts
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-card-footer">
+                    @if (!string.IsNullOrEmpty(s.Notes))
+                    {
+                        <div class="sub-notes">
+                            <i class="fa fa-comment fa-xs"></i> @s.Notes
+                        </div>
+                    }
+
+                    <div class="action-group">
+                        @* Verify button *@
+                        <form action="@Url.Action("ConfirmVerify","Officer", new { id = s.RecyclingSubmissionId })" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-verify"
+                                    onclick="return confirm('Verify this submission and award @((int)Math.Floor(s.WeightKg * s.MaterialType.PointsPerKg)) points to @s.Resident.FirstName?')">
+                                <i class="fa fa-circle-check fa-xs"></i> Verify
+                            </button>
+                        </form>
+
+                        @* Reject form with reason input *@
+                        <form action="@Url.Action("ConfirmReject","Officer", new { id = s.RecyclingSubmissionId })" method="post" class="reject-form">
+                            @Html.AntiForgeryToken()
+                            <input type="text" name="rejectionReason" class="reject-input" placeholder="Rejection reason (required)" required />
+                            <button type="submit" class="btn-reject">
+                                <i class="fa fa-circle-xmark fa-xs"></i> Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fa fa-circle-check"></i>
+            <strong>All caught up!</strong>
+            <p style="margin-top:8px;">No pending submissions at your assigned drop-off points right now.</p>
+        </div>
+    }
+</div>

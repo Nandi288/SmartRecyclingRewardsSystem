@@ -208,7 +208,10 @@
     <Compile Include="Controllers\DropOffPointController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ImpactController.cs" />
+    <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\MaterialTypeController.cs" />
+    <Compile Include="Controllers\OfficerController.cs" />
+    <Compile Include="Controllers\PointsController.cs" />
     <Compile Include="Controllers\RecycleController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Data\ApplicationDbInitializer.cs" />
@@ -313,6 +316,11 @@
     <Content Include="Views\Recycle\MySubmissions.cshtml" />
     <Content Include="Views\Impact\Index.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
+    <Content Include="Views\Officer\Pending.cshtml" />
+    <Content Include="Views\Officer\AllSubmissions.cshtml" />
+    <Content Include="Views\Points\Index.cshtml" />
+    <Content Include="Views\Locations\Index.cshtml" />
+    <Content Include="Views\Officer\Verify.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title - EcoRewards SA</title>
 
-    @* Bootstrap 5 *@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    @* Font Awesome for icons *@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-    @* Google Fonts: Syne (display) + Inter (body) *@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
     <style>
-        /* ── Token System ─────────────────────────────────────── */
         :root {
             --green-deep: #1a3a2a;
             --green-mid: #2d6a4f;
@@ -25,7 +21,6 @@
             --nav-h: 64px;
         }
 
-        /* ── Base ─────────────────────────────────────────────── */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -42,7 +37,6 @@
             flex-direction: column;
         }
 
-        /* ── Navbar ───────────────────────────────────────────── */
         .srr-nav {
             position: fixed;
             top: 0;
@@ -123,7 +117,6 @@
                         color: var(--green-deep);
                     }
 
-        /* Unread notification badge */
         .nav-bell {
             position: relative;
         }
@@ -139,13 +132,11 @@
             border: 1.5px solid var(--green-deep);
         }
 
-        /* ── Page body offset for fixed nav ──────────────────── */
         .page-body {
             margin-top: var(--nav-h);
             flex: 1;
         }
 
-        /* ── Role pill shown in nav when logged in ────────────── */
         .role-pill {
             display: inline-flex;
             align-items: center;
@@ -173,7 +164,6 @@
                 color: #f87171;
             }
 
-        /* ── Flash messages ───────────────────────────────────── */
         .flash-bar {
             padding: 12px 2rem;
             font-size: 14px;
@@ -199,7 +189,6 @@
             border-color: #bfdbfe;
         }
 
-        /* ── Footer ───────────────────────────────────────────── */
         .srr-footer {
             background: var(--green-deep);
             color: rgba(255,255,255,0.5);
@@ -214,7 +203,6 @@
                 text-decoration: none;
             }
 
-        /* ── Utility: section cards used across the app ───────── */
         .srr-card {
             background: #fff;
             border: 1px solid rgba(0,0,0,0.07);
@@ -222,7 +210,6 @@
             padding: 24px;
         }
 
-        /* ── Page header strip (used on inner pages) ──────────── */
         .page-header {
             background: var(--green-deep);
             color: #fff;
@@ -242,7 +229,6 @@
                 margin: 0;
             }
 
-        /* ── Status badges ────────────────────────────────────── */
         .badge-pending {
             background: #fef9c3;
             color: #854d0e;
@@ -261,7 +247,6 @@
             border: 1px solid #fecaca;
         }
 
-        /* ── Buttons ──────────────────────────────────────────── */
         .btn-srr {
             background: var(--green-mid);
             color: #fff;
@@ -305,7 +290,6 @@
                 color: #fff;
             }
 
-        /* ── Responsive ───────────────────────────────────────── */
         @@media (max-width: 768px) {
             .srr-nav {
                 padding: 0 1rem;
@@ -321,7 +305,6 @@
 </head>
 <body>
 
-    @* ── Navigation ──────────────────────────────────────────────── *@
     <nav class="srr-nav">
         <a href="@Url.Action("Index", "Home")" class="brand">
             <div class="brand-icon"><i class="fa fa-recycle"></i></div>
@@ -331,39 +314,31 @@
         <div class="nav-links">
             @if (Request.IsAuthenticated)
             {
-                @* Show different nav depending on role *@
                 if (User.IsInRole("Resident"))
                 {
                     <span class="role-pill resident"><i class="fa fa-house fa-xs"></i> Resident</span>
-                    <a href="/Recycle/Log"><i class="fa fa-plus"></i> Log Recycling</a>
-                    <a href="/Recycle/MySubmissions">My Submissions</a>
-                    <a href="@Url.Action("Index", "PointTransaction")">Points</a>
-                    <a href="@Url.Action("Index", "Leaderboard")">Leaderboard</a>
+                    <a href="@Url.Action("Log", "Recycle")"><i class="fa fa-plus"></i> Log Recycling</a>
+                    <a href="@Url.Action("MySubmissions", "Recycle")">My Submissions</a>
+                    <a href="@Url.Action("Index", "Points")">Points</a>
+                    <a href="@Url.Action("Index", "Locations")">Drop-Offs</a>
+                    <a href="@Url.Action("Index", "Impact")">My Impact</a>
                 }
                 else if (User.IsInRole("CollectionOfficer"))
                 {
                     <span class="role-pill collectionofficer"><i class="fa fa-shield fa-xs"></i> Officer</span>
-                    <a href="@Url.Action("Pending", "RecyclingSubmission")">Pending</a>
-                    <a href="@Url.Action("Index", "RecyclingSubmission")">All Submissions</a>
+                    <a href="@Url.Action("Pending", "Officer")">
+                        <i class="fa fa-hourglass-half fa-xs"></i> Pending
+                    </a>
+                    <a href="@Url.Action("AllSubmissions", "Officer")">All Submissions</a>
                 }
                 else if (User.IsInRole("Admin"))
                 {
                     <span class="role-pill admin"><i class="fa fa-crown fa-xs"></i> Admin</span>
-                    <a href="@Url.Action("Index", "Admin")">Dashboard</a>
+                    <a href="@Url.Action("Admin", "Dashboard")">Dashboard</a>
                     <a href="@Url.Action("Index", "MaterialType")">Materials</a>
                     <a href="@Url.Action("Index", "DropOffPoint")">Drop-Off Points</a>
                     <a href="@Url.Action("Index", "Report")">Reports</a>
                 }
-
-                @* Notification bell *@
-                <a href="@Url.Action("Index", "Notification")" class="nav-bell">
-                    <i class="fa fa-bell"></i>
-                    @* Show red dot if unread notifications exist *@
-                    @if (ViewBag.UnreadCount != null && ViewBag.UnreadCount > 0)
-                    {
-                        <span class="nav-badge"></span>
-                    }
-                </a>
 
                 <form id="logoutForm" action="@Url.Action("LogOff", "Account")" method="post" style="display:inline;">
                     @Html.AntiForgeryToken()
@@ -380,7 +355,6 @@
         </div>
     </nav>
 
-    @* ── Flash messages ───────────────────────────────────────────── *@
     <div class="page-body">
         @if (TempData["Success"] != null)
         {
@@ -404,14 +378,12 @@
         @RenderBody()
     </div>
 
-    @* ── Footer ───────────────────────────────────────────────────── *@
     <footer class="srr-footer">
         <span>&copy; @DateTime.Now.Year EcoRewards SA &mdash; eThekwini, KwaZulu-Natal</span>
         &nbsp;·&nbsp;
         <span>Built by DUT Application Development students</span>
     </footer>
 
-    @* Scripts *@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>

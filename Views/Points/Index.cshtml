@@ -1,0 +1,313 @@
+﻿@using SmartRecyclingRewardsSystem.Models
+@{
+    ViewBag.Title = "My Points";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var resident = ViewBag.Resident as SmartRecyclingRewardsSystem.Models.ApplicationUser;
+    var transactions = ViewBag.Transactions as List<SmartRecyclingRewardsSystem.Models.PointTransaction>;
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .balance-banner {
+            background: linear-gradient(135deg, #1a3a2a 0%, #2d6a4f 100%);
+            border-radius: 14px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .balance-left h1 {
+            font-family: 'Syne',sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.6);
+            margin: 0 0 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .balance-num {
+            font-family: 'Syne',sans-serif;
+            font-size: 52px;
+            font-weight: 800;
+            color: #b7e04a;
+            line-height: 1;
+        }
+
+        .balance-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 6px;
+        }
+
+        .balance-stats {
+            display: flex;
+            gap: 24px;
+        }
+
+        .bal-stat {
+            text-align: center;
+        }
+
+        .bal-stat-num {
+            font-family: 'Syne',sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .bal-stat-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .section-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .section-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+            .section-head h2 {
+                font-family: 'Syne',sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+        .tx-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .tx-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 11px 20px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .tx-table td {
+                padding: 14px 20px;
+                font-size: 13px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+                vertical-align: middle;
+            }
+
+            .tx-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .tx-earned {
+            font-weight: 700;
+            font-size: 15px;
+            color: #166534;
+        }
+
+        .tx-redeemed {
+            font-weight: 700;
+            font-size: 15px;
+            color: #991b1b;
+        }
+
+        .tx-adjusted {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1a6fa8;
+        }
+
+        .tx-desc {
+            font-size: 13px;
+            color: var(--text-dark);
+        }
+
+        .tx-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tx-bal {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tx-type-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 9px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-earned {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .pill-redeemed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .pill-adjusted {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+            .empty-state i {
+                font-size: 40px;
+                color: var(--green-bright);
+                margin-bottom: 12px;
+                display: block;
+            }
+
+        @@media(max-width:600px) {
+            .balance-banner {
+                flex-direction: column;
+            }
+
+            .balance-stats {
+                justify-content: center;
+            }
+
+            .balance-num {
+                font-size: 40px;
+            }
+        }
+    </style>
+}
+
+<div class="page-wrap">
+
+    @* ── Points Balance Banner ────────────────────────────────── *@
+    <div class="balance-banner">
+        <div class="balance-left">
+            <h1>Points Balance</h1>
+            <div class="balance-num">@resident.PointsBalance</div>
+            <div class="balance-sub">Available to redeem · Hi, @resident.FirstName!</div>
+        </div>
+        <div class="balance-stats">
+            <div class="bal-stat">
+                <div class="bal-stat-num">@ViewBag.TotalEarned</div>
+                <div class="bal-stat-label">Total Earned</div>
+            </div>
+            <div class="bal-stat">
+                <div class="bal-stat-num">@ViewBag.TotalRedeemed</div>
+                <div class="bal-stat-label">Total Redeemed</div>
+            </div>
+            <div class="bal-stat">
+                <div class="bal-stat-num">@(transactions != null ? transactions.Count : 0)</div>
+                <div class="bal-stat-label">Transactions</div>
+            </div>
+        </div>
+    </div>
+
+    @* ── Transaction History ──────────────────────────────────── *@
+    <div class="section-card">
+        <div class="section-head">
+            <h2><i class="fa fa-clock-rotate-left fa-sm"></i> Points History</h2>
+        </div>
+
+        @if (transactions != null && transactions.Any())
+        {
+            <table class="tx-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Points</th>
+                        <th>Balance After</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in transactions)
+                    {
+                        <tr>
+                            <td>
+                                <div class="tx-date">@t.TransactionDate.ToString("dd MMM yyyy")</div>
+                                <div class="tx-date">@t.TransactionDate.ToString("HH:mm")</div>
+                            </td>
+                            <td>
+                                @if (t.TransactionType == TransactionType.Earned)
+                                {
+                                    <span class="tx-type-pill pill-earned"><i class="fa fa-arrow-up fa-xs"></i> Earned</span>
+                                }
+                                else if (t.TransactionType == TransactionType.Redeemed)
+                                {
+                                    <span class="tx-type-pill pill-redeemed"><i class="fa fa-arrow-down fa-xs"></i> Redeemed</span>
+                                }
+                                else
+                                {
+                                    <span class="tx-type-pill pill-adjusted"><i class="fa fa-pen fa-xs"></i> Adjusted</span>
+                                }
+                            </td>
+                            <td class="tx-desc">@t.Description</td>
+                            <td>
+                                @if (t.TransactionType == TransactionType.Earned)
+                                {
+                                    <span class="tx-earned">+@t.Points</span>
+                                }
+                                else if (t.TransactionType == TransactionType.Redeemed)
+                                {
+                                    <span class="tx-redeemed">-@t.Points</span>
+                                }
+                                else
+                                {
+                                    <span class="tx-adjusted">@t.Points</span>
+                                }
+                            </td>
+                            <td class="tx-bal">@t.BalanceAfter pts</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fa fa-star"></i>
+                <strong>No transactions yet.</strong>
+                <p style="margin-top:8px;">Your points history will appear here once a submission is verified.</p>
+                <a href="@Url.Action("Log","Recycle")" style="color:var(--green-mid);font-weight:600;text-decoration:none;margin-top:8px;display:inline-block;">
+                    Log a recycling submission →
+                </a>
+            </div>
+        }
+    </div>
+</div>

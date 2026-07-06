@@ -1,0 +1,308 @@
+﻿@using SmartRecyclingRewardsSystem.Models
+@model List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>
+@{
+    ViewBag.Title = "All Submissions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string currentStatus = ViewBag.CurrentStatus ?? "all";
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .page-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .page-top h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 24px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1.5px solid #d1d9d4;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+            .filter-tab:hover {
+                border-color: var(--green-mid);
+                color: var(--green-mid);
+            }
+
+            .filter-tab.active {
+                background: var(--green-mid);
+                color: #fff;
+                border-color: var(--green-mid);
+            }
+
+            .filter-tab.pending-tab.active {
+                background: #f59e0b;
+                border-color: #f59e0b;
+            }
+
+            .filter-tab.verified-tab.active {
+                background: #16a34a;
+                border-color: #16a34a;
+            }
+
+            .filter-tab.rejected-tab.active {
+                background: #ef4444;
+                border-color: #ef4444;
+            }
+
+        .pending-alert {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef9c3;
+            color: #854d0e;
+            border: 1px solid #fde68a;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .sub-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+            .sub-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 11px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .sub-table td {
+                padding: 13px 16px;
+                font-size: 13px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+                vertical-align: middle;
+            }
+
+            .sub-table tr:last-child td {
+                border-bottom: none;
+            }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-verified {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .resident-name {
+            font-weight: 600;
+            color: var(--green-deep);
+        }
+
+        .resident-email {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .rejection-reason {
+            font-size: 11px;
+            color: #991b1b;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .btn-verify-sm {
+            background: #dcfce7;
+            color: #166534;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-pending-link {
+            color: var(--green-mid);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .btn-pending-link:hover {
+                text-decoration: underline;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+            .empty-state i {
+                font-size: 36px;
+                color: var(--green-bright);
+                display: block;
+                margin-bottom: 12px;
+            }
+    </style>
+}
+
+<div class="page-wrap">
+    <div class="page-top">
+        <h1><i class="fa fa-list" style="color:var(--green-mid);margin-right:8px;"></i> All Submissions</h1>
+        <a href="@Url.Action("Pending","Officer")" style="background:#fef9c3;color:#854d0e;border:1px solid #fde68a;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+            <i class="fa fa-hourglass-half fa-xs"></i> @ViewBag.PendingCount Pending
+        </a>
+    </div>
+
+    @* Filter tabs *@
+    <div class="filter-tabs">
+        <a href="@Url.Action("AllSubmissions","Officer", new { status = "all" })"
+           class="filter-tab @(currentStatus == "all" ? "active" : "")">All</a>
+        <a href="@Url.Action("AllSubmissions","Officer", new { status = "pending" })"
+           class="filter-tab pending-tab @(currentStatus == "pending" ? "active" : "")">
+            <i class="fa fa-clock fa-xs"></i> Pending
+        </a>
+        <a href="@Url.Action("AllSubmissions","Officer", new { status = "verified" })"
+           class="filter-tab verified-tab @(currentStatus == "verified" ? "active" : "")">
+            <i class="fa fa-circle-check fa-xs"></i> Verified
+        </a>
+        <a href="@Url.Action("AllSubmissions","Officer", new { status = "rejected" })"
+           class="filter-tab rejected-tab @(currentStatus == "rejected" ? "active" : "")">
+            <i class="fa fa-circle-xmark fa-xs"></i> Rejected
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa fa-inbox"></i>
+            <strong>No submissions found.</strong>
+            <p style="margin-top:6px;">No submissions match the selected filter.</p>
+        </div>
+    }
+    else
+    {
+        <table class="sub-table">
+            <thead>
+                <tr>
+                    <th>Resident</th>
+                    <th>Material</th>
+                    <th>Weight</th>
+                    <th>Drop-Off Point</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="resident-name">@s.Resident.FullName</div>
+                            <div class="resident-email">@s.Resident.Email</div>
+                        </td>
+                        <td>@s.MaterialType.Name</td>
+                        <td>@s.WeightKg kg</td>
+                        <td>@s.DropOffPoint.Name</td>
+                        <td>@s.SubmissionDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (s.Status == SubmissionStatus.Pending)
+                            {
+                                <span class="badge-pill badge-pending"><i class="fa fa-clock fa-xs"></i> Pending</span>
+                                <div style="margin-top:4px;">
+                                    <a href="@Url.Action("Verify","Officer", new { id = s.RecyclingSubmissionId })" class="btn-pending-link">
+                                        Review →
+                                    </a>
+                                </div>
+                            }
+                            else if (s.Status == SubmissionStatus.Verified)
+                            {
+                                <span class="badge-pill badge-verified"><i class="fa fa-check fa-xs"></i> Verified</span>
+                                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+                                    @(s.ProcessedAt.HasValue ? s.ProcessedAt.Value.ToString("dd MMM") : "")
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="badge-pill badge-rejected"><i class="fa fa-xmark fa-xs"></i> Rejected</span>
+                                if (!string.IsNullOrEmpty(s.RejectionReason))
+                                {
+                                    <div class="rejection-reason">@s.RejectionReason</div>
+                                }
+                            }
+                        </td>
+                        <td>
+                            @if (s.PointsAwarded > 0)
+                            {
+                                <span style="color:#166534;font-weight:700;">+@s.PointsAwarded</span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--text-muted);">—</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

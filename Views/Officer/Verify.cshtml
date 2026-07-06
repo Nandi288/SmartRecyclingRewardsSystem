@@ -1,0 +1,316 @@
+﻿@model SmartRecyclingRewardsSystem.Models.RecyclingSubmission
+@{
+    ViewBag.Title = "Review Submission";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var estimatedPoints = (int)Math.Floor(Model.WeightKg * Model.MaterialType.PointsPerKg);
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 680px;
+            margin: 40px auto;
+            padding: 0 20px 60px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--green-mid);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+            .back-link:hover {
+                text-decoration: underline;
+                color: var(--green-mid);
+            }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(26,58,42,0.06);
+        }
+
+        .review-header {
+            background: var(--green-deep);
+            padding: 24px 28px;
+        }
+
+            .review-header h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 20px;
+                font-weight: 700;
+                color: #fff;
+                margin: 0 0 4px;
+            }
+
+            .review-header p {
+                color: rgba(255,255,255,0.6);
+                font-size: 13px;
+                margin: 0;
+            }
+
+        .review-body {
+            padding: 28px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .detail-item {
+            background: #f8fdf9;
+            border: 1px solid #e8f3ed;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .points-preview {
+            background: linear-gradient(135deg,#1a3a2a,#2d6a4f);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .points-preview-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.65);
+        }
+
+        .points-preview-num {
+            font-family: 'Syne',sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #b7e04a;
+        }
+
+        .points-preview-sub {
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            margin-top: 2px;
+        }
+
+        .notes-box {
+            background: #fef9c3;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #854d0e;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #f0f0f0;
+            margin: 24px 0;
+        }
+
+        .action-section h3 {
+            font-family: 'Syne',sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 16px;
+        }
+
+        .btn-verify-big {
+            width: 100%;
+            background: #dcfce7;
+            color: #166534;
+            border: 1.5px solid #bbf7d0;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: 'Inter',sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: background 0.2s;
+            margin-bottom: 16px;
+        }
+
+            .btn-verify-big:hover {
+                background: #bbf7d0;
+            }
+
+        .reject-section {
+            background: #fff5f5;
+            border: 1.5px solid #fecaca;
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+            .reject-section label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: #991b1b;
+                margin-bottom: 8px;
+            }
+
+        .reject-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #fecaca;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Inter',sans-serif;
+            color: var(--text-dark);
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+            .reject-input:focus {
+                border-color: #ef4444;
+                box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+            }
+
+        .btn-reject-big {
+            width: 100%;
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1.5px solid #fecaca;
+            border-radius: 10px;
+            padding: 13px;
+            font-family: 'Inter',sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: background 0.2s;
+        }
+
+            .btn-reject-big:hover {
+                background: #fecaca;
+            }
+
+        @@media(max-width:480px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}
+
+<div class="page-wrap">
+
+    <a href="@Url.Action("Pending","Officer")" class="back-link">
+        <i class="fa fa-arrow-left fa-xs"></i> Back to Pending
+    </a>
+
+    <div class="review-card">
+        <div class="review-header">
+            <h1><i class="fa fa-clipboard-check"></i> Review Submission</h1>
+            <p>Submitted by @Model.Resident.FullName on @Model.SubmissionDate.ToString("dd MMM yyyy, HH:mm")</p>
+        </div>
+
+        <div class="review-body">
+
+            @* Submission details *@
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">Resident</div>
+                    <div class="detail-value">@Model.Resident.FullName</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">@Model.Resident.Email</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Material Type</div>
+                    <div class="detail-value">@Model.MaterialType.Name</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Weight</div>
+                    <div class="detail-value">@Model.WeightKg kg</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Drop-Off Point</div>
+                    <div class="detail-value">@Model.DropOffPoint.Name</div>
+                </div>
+            </div>
+
+            @* Points preview *@
+            <div class="points-preview">
+                <div>
+                    <div class="points-preview-label">Points that will be awarded if verified</div>
+                    <div class="points-preview-sub">@Model.WeightKg kg × @Model.MaterialType.PointsPerKg pts/kg</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="points-preview-num">@estimatedPoints</div>
+                    <div class="points-preview-sub">points</div>
+                </div>
+            </div>
+
+            @* Resident notes if any *@
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <div class="notes-box">
+                    <i class="fa fa-comment fa-xs"></i>
+                    <strong>Resident's note:</strong> @Model.Notes
+                </div>
+            }
+
+            <hr class="divider" />
+
+            @* Verify action *@
+            <div class="action-section">
+                <h3>Your Decision</h3>
+
+                <form action="@Url.Action("ConfirmVerify","Officer", new { id = Model.RecyclingSubmissionId })" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn-verify-big"
+                            onclick="return confirm('Verify this submission and award @estimatedPoints points to @Model.Resident.FirstName?')">
+                        <i class="fa fa-circle-check"></i>
+                        Verify — Award @estimatedPoints Points to @Model.Resident.FirstName
+                    </button>
+                </form>
+
+                @* Reject action *@
+                <div class="reject-section">
+                    <label><i class="fa fa-circle-xmark fa-xs"></i> Reject this submission</label>
+                    <form action="@Url.Action("ConfirmReject","Officer", new { id = Model.RecyclingSubmissionId })" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="text" name="rejectionReason" class="reject-input"
+                               placeholder="Enter reason for rejection (required)" required />
+                        <button type="submit" class="btn-reject-big">
+                            <i class="fa fa-circle-xmark"></i> Reject Submission
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
