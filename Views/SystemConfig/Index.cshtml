@@ -5,58 +5,289 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>System Configuration</h2>
+<!-- Page Header -->
+<div class="page-header">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1>
+                    <i class="fa fa-gear" style="color: var(--lime);"></i> System Configuration
+                </h1>
+                <p>Manage application settings and system preferences</p>
+            </div>
+            <div class="col-md-4 text-end">
+                
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Alert Messages -->
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="flash-bar flash-success">
+        <i class="fa fa-circle-check"></i> @TempData["SuccessMessage"]
     </div>
 }
 @if (TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="flash-bar flash-error">
+        <i class="fa fa-circle-exclamation"></i> @TempData["ErrorMessage"]
     </div>
 }
 
-@using (Html.BeginForm("Update", "SystemConfig", FormMethod.Post))
-{
-    @Html.AntiForgeryToken()
+<!-- Main Content -->
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="srr-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <i class="fa fa-sliders-h" style="color: var(--green-mid);"></i>
+                        <span class="fw-semibold ms-2">Application Settings</span>
+                    </div>
+                    <div>
+                        <span class="text-muted" style="font-size: 13px;">
+                            <i class="fa fa-clock-o"></i>
+                            Last Updated: @(Model.Any() ? Model.Max(m => m.LastUpdated).ToString("dd MMM yyyy HH:mm") : "Never")
+                        </span>
+                    </div>
+                </div>
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                @{
-                    int index = 0;
-                }
-                @foreach (var item in Model)
+                @using (Html.BeginForm("Update", "SystemConfig", FormMethod.Post))
                 {
-                    <tr>
-                        <td>
-                            <strong>@item.Key</strong>
-                            @Html.Hidden($"settings[{index}].SystemConfigId", item.SystemConfigId)
-                        </td>
-                        <td>
-                            @Html.TextBox($"settings[{index}].Value", item.Value, new { @class = "form-control", style = "min-width:200px;" })
-                        </td>
-                        <td>@item.Description</td>
-                    </tr>
-                    index++;
+                    @Html.AntiForgeryToken()
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" style="font-size: 14px;">
+                            <thead style="background: var(--green-deep); color: #fff; border-radius: 8px;">
+                                <tr>
+                                    <th style="width: 20%; padding: 12px 16px;">
+                                        <i class="fa fa-key"></i> Key
+                                    </th>
+                                    <th style="width: 50%; padding: 12px 16px;">
+                                        <i class="fa fa-edit"></i> Value
+                                    </th>
+                                    <th style="width: 30%; padding: 12px 16px;">
+                                        <i class="fa fa-info-circle"></i> Description
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    int index = 0;
+                                }
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td style="padding: 10px 16px;">
+                                            <span class="fw-semibold" style="color: var(--green-mid);">@item.Key</span>
+                                            @Html.Hidden($"settings[{index}].SystemConfigId", item.SystemConfigId)
+                                        </td>
+                                        <td style="padding: 10px 16px;">
+                                            @Html.TextBox($"settings[{index}].Value", item.Value, new
+                                            {
+                                                @class = "form-control form-control-sm",
+                                                style = "min-width: 200px; font-size: 14px; border-radius: 6px; border: 1.5px solid #e5e7eb;",
+                                                placeholder = "Enter value..."
+                                            })
+                                        </td>
+                                        <td style="padding: 10px 16px;">
+                                            <span class="text-muted" style="font-size: 13px;">@item.Description</span>
+                                            <br />
+                                            <small style="color: var(--text-muted); font-size: 11px;">
+                                                <i class="fa fa-clock-o"></i> @item.LastUpdated.ToString("dd MMM HH:mm")
+                                            </small>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid rgba(0,0,0,0.07);">
+                        <div>
+                            <button type="submit" class="btn-srr">
+                                <i class="fa fa-save"></i> Save All Settings
+                            </button>
+                            <a href="@Url.Action("Admin", "Dashboard")" class="btn-srr btn-srr-outline ms-2">
+                                <i class="fa fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                        <div>
+                            <span class="text-muted" style="font-size: 13px;">
+                                <i class="fa fa-info-circle"></i>
+                                Changes take effect immediately
+                            </span>
+                        </div>
+                    </div>
                 }
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save All Settings</button>
-    <a href="@Url.Action("Index", "Dashboard")" class="btn btn-secondary">Back to Dashboard</a>
-}
+    <!-- Stats Cards -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="srr-card text-center" style="background: rgba(26, 58, 42, 0.05); border: 1px solid rgba(26, 58, 42, 0.1);">
+                <div style="font-size: 28px; color: var(--green-mid);">
+                    <i class="fa fa-database"></i>
+                </div>
+                <h5 style="font-family: 'Syne', sans-serif; margin: 8px 0 4px;">@Model.Count()</h5>
+                <p class="text-muted" style="font-size: 13px; margin: 0;">Settings Configured</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="srr-card text-center" style="background: rgba(183, 224, 74, 0.1); border: 1px solid rgba(183, 224, 74, 0.2);">
+                <div style="font-size: 28px; color: var(--lime);">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+                <h5 style="font-family: 'Syne', sans-serif; margin: 8px 0 4px;">All Valid</h5>
+                <p class="text-muted" style="font-size: 13px; margin: 0;">Settings Verified</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="srr-card text-center" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1);">
+                <div style="font-size: 28px; color: #f87171;">
+                    <i class="fa fa-shield-alt"></i>
+                </div>
+                <h5 style="font-family: 'Syne', sans-serif; margin: 8px 0 4px;">Admin</h5>
+                <p class="text-muted" style="font-size: 13px; margin: 0;">Access Restricted</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Ensure the page header matches the layout's page-header */
+    .page-header {
+        background: var(--green-deep);
+        color: #fff;
+        padding: 36px 2rem 32px;
+        margin-bottom: 0;
+    }
+
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+            margin: 0;
+        }
+
+    /* Override srr-card to match layout */
+    .srr-card {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.07);
+        border-radius: 12px;
+        padding: 24px;
+    }
+
+    /* Table styling */
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table th {
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+    .table-hover tbody tr:hover {
+        background: rgba(26, 58, 42, 0.03);
+    }
+
+    /* Form control styling */
+    .form-control-sm:focus {
+        border-color: var(--green-mid) !important;
+        box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.15) !important;
+    }
+
+    /* Button overrides to match layout */
+    .btn-srr {
+        background: var(--green-mid);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+        .btn-srr:hover {
+            background: #245c42;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .btn-srr-lime {
+        background: var(--lime);
+        color: var(--green-deep);
+    }
+
+        .btn-srr-lime:hover {
+            background: #c8f05a;
+            color: var(--green-deep);
+        }
+
+    .btn-srr-outline {
+        background: transparent;
+        color: var(--green-mid);
+        border: 1.5px solid var(--green-mid);
+    }
+
+        .btn-srr-outline:hover {
+            background: var(--green-mid);
+            color: #fff;
+        }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .page-header h1 {
+            font-size: 22px;
+        }
+
+        .table th,
+        .table td {
+            font-size: 13px;
+        }
+
+        .table-responsive {
+            border: none;
+        }
+
+        .srr-card {
+            padding: 16px;
+        }
+
+        .btn-srr {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+    }
+
+    /* Role pill override for admin */
+    .role-pill.admin {
+        background: rgba(239,68,68,0.2);
+        color: #f87171;
+    }
+</style>
