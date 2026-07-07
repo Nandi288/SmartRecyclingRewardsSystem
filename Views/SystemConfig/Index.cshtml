@@ -1,0 +1,62 @@
+﻿@model IEnumerable<SmartRecyclingRewardsSystem.Models.SystemConfig>
+
+@{
+    ViewBag.Title = "System Configuration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>System Configuration</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@using (Html.BeginForm("Update", "SystemConfig", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int index = 0;
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@item.Key</strong>
+                            @Html.Hidden($"settings[{index}].SystemConfigId", item.SystemConfigId)
+                        </td>
+                        <td>
+                            @Html.TextBox($"settings[{index}].Value", item.Value, new { @class = "form-control", style = "min-width:200px;" })
+                        </td>
+                        <td>@item.Description</td>
+                    </tr>
+                    index++;
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save All Settings</button>
+    <a href="@Url.Action("Index", "Dashboard")" class="btn btn-secondary">Back to Dashboard</a>
+}

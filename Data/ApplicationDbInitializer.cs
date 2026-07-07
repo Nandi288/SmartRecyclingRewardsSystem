@@ -128,7 +128,7 @@ namespace SmartRecyclingRewardsSystem.Data
                 new SystemConfig
                 {
                     Key = "ClickatellApiKey",
-                    Value = "",
+                    Value = "UNSET",
                     Description = "Clickatell API key for SMS notifications",
                     LastUpdated = DateTime.Now
                 }

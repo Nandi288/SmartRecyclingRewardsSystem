@@ -214,6 +214,7 @@
     <Compile Include="Controllers\PointsController.cs" />
     <Compile Include="Controllers\RecycleController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\SystemConfigController.cs" />
     <Compile Include="Data\ApplicationDbInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -321,6 +322,7 @@
     <Content Include="Views\Points\Index.cshtml" />
     <Content Include="Views\Locations\Index.cshtml" />
     <Content Include="Views\Officer\Verify.cshtml" />
+    <Content Include="Views\SystemConfig\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
