@@ -321,7 +321,9 @@
                     <a href="@Url.Action("MySubmissions", "Recycle")">My Submissions</a>
                     <a href="@Url.Action("Index", "Points")">Points</a>
                     <a href="@Url.Action("Index", "Locations")">Drop-Offs</a>
+                    <a href="@Url.Action("Index", "CollectionEvents")"><i class="fa fa-calendar-days"></i> Events</a>
                     <a href="@Url.Action("Index", "Impact")">My Impact</a>
+
                 }
                 else if (User.IsInRole("CollectionOfficer"))
                 {
@@ -337,7 +339,9 @@
                     <a href="@Url.Action("Admin", "Dashboard")">Dashboard</a>
                     <a href="@Url.Action("Index", "MaterialType")">Materials</a>
                     <a href="@Url.Action("Index", "DropOffPoint")">Drop-Off Points</a>
+                    <a href="@Url.Action("Index", "AdminCollectionEvent")">Events</a>
                     <a href="@Url.Action("Index", "Report")">Reports</a>
+                   
                 }
 
                 <form id="logoutForm" action="@Url.Action("LogOff", "Account")" method="post" style="display:inline;">

@@ -1,0 +1,464 @@
+@using SmartRecyclingRewardsSystem.Models
+@model SmartRecyclingRewardsSystem.Models.CollectionEvent
+@{
+    ViewBag.Title = "Edit Collection Event";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var dropOffPoints = ViewBag.DropOffPoints as List<DropOffPoint> ?? new List<DropOffPoint>();
+}
+
+@section styles {
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --green-deep: #1a4d3e;
+            --green-mid: #2d7a5a;
+            --green-bright: #4caf84;
+            --text-dark: #1e1e1e;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --input-focus: var(--green-mid);
+            --error-color: #dc3545;
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .form-wrap {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+            /* ===== PAGE HEADER ===== */
+            .form-wrap h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 24px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin-bottom: 24px;
+            }
+
+        /* ===== FORM CARD ===== */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        /* ===== FORM GROUPS ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group:last-of-type {
+                margin-bottom: 24px;
+            }
+
+            .form-group label {
+                display: block;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-dark);
+                margin-bottom: 6px;
+            }
+
+            .form-group .label-hint {
+                font-weight: 400;
+                color: var(--text-muted);
+            }
+
+            .form-group .field-validation-error {
+                display: block;
+                font-size: 12px;
+                color: var(--error-color);
+                margin-top: 4px;
+            }
+
+            .form-group .validation-summary-errors {
+                color: var(--error-color);
+                font-size: 13px;
+                margin-bottom: 16px;
+                padding: 10px 14px;
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 6px;
+            }
+
+                .form-group .validation-summary-errors ul {
+                    margin: 0;
+                    padding-left: 20px;
+                }
+
+        /* ===== FORM ROW ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* ===== FORM CONTROLS ===== */
+        .form-control {
+            width: 100%;
+            padding: 9px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-dark);
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--input-focus);
+                box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.1);
+            }
+
+            .form-control.input-validation-error {
+                border-color: var(--error-color);
+            }
+
+                .form-control.input-validation-error:focus {
+                    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+                }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select.form-control {
+            appearance: auto;
+            cursor: pointer;
+        }
+
+        /* ===== CHECKBOX ROW ===== */
+        .check-row {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 24px;
+            padding: 12px 14px;
+            background: #f8fdf9;
+            border: 1px solid #e5f0e8;
+            border-radius: 8px;
+        }
+
+            .check-row input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                flex-shrink: 0;
+                accent-color: var(--green-mid);
+                cursor: pointer;
+            }
+
+            .check-row label {
+                font-size: 13px;
+                color: var(--text-dark);
+                cursor: pointer;
+                margin: 0;
+                font-weight: 500;
+            }
+
+            .check-row .check-hint {
+                font-weight: 400;
+                color: var(--text-muted);
+                font-size: 12px;
+            }
+
+        /* ===== BUTTONS ===== */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+
+        .btn-srr {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--green-mid);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 22px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+            .btn-srr:hover {
+                background: #245c42;
+                text-decoration: none;
+                color: #ffffff;
+            }
+
+            .btn-srr:active {
+                transform: scale(0.97);
+            }
+
+        .btn-srr-outline {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+            .btn-srr-outline:hover {
+                background: #f9fafb;
+                color: var(--text-dark);
+                border-color: #d1d5db;
+            }
+
+        .btn-srr-danger {
+            background: #dc3545;
+            color: #ffffff;
+        }
+
+            .btn-srr-danger:hover {
+                background: #c82333;
+                color: #ffffff;
+            }
+
+        /* ===== DELETE SECTION ===== */
+        .delete-section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+            .delete-section .delete-warning {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 13px;
+                color: var(--text-muted);
+                margin-bottom: 10px;
+            }
+
+                .delete-section .delete-warning i {
+                    color: #dc3545;
+                    font-size: 16px;
+                }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 600px) {
+            .form-wrap {
+                padding: 20px 16px 40px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+                .form-actions .btn-srr {
+                    width: 100%;
+                    justify-content: center;
+                }
+
+            .check-row {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* ===== DARK MODE SUPPORT ===== */
+        @@media (prefers-color-scheme: dark) {
+            .form-card {
+                background: #1f2937;
+                border-color: #374151;
+            }
+
+            .form-control {
+                background: #374151;
+                border-color: #4b5563;
+                color: #f3f4f6;
+            }
+
+                .form-control:focus {
+                    border-color: var(--green-bright);
+                    box-shadow: 0 0 0 3px rgba(76, 175, 132, 0.2);
+                }
+
+            .form-group label {
+                color: #f3f4f6;
+            }
+
+            .form-group .label-hint {
+                color: #9ca3af;
+            }
+
+            .btn-srr-outline {
+                color: #9ca3af;
+                border-color: #4b5563;
+            }
+
+                .btn-srr-outline:hover {
+                    background: #374151;
+                    color: #f3f4f6;
+                }
+
+            .check-row {
+                background: #1a2d24;
+                border-color: #2d4a3a;
+            }
+
+                .check-row label {
+                    color: #f3f4f6;
+                }
+
+                .check-row .check-hint {
+                    color: #9ca3af;
+                }
+
+            .delete-section {
+                border-top-color: #374151;
+            }
+        }
+    </style>
+}
+
+<div class="form-wrap">
+    <h1>
+        <i class="fa fa-calendar-pen" style="color: var(--green-mid); margin-right: 8px;"></i>
+        Edit Collection Event
+    </h1>
+
+    <div class="form-card">
+        @using (Html.BeginForm("Edit", "AdminCollectionEvent", FormMethod.Post, new { novalidate = "novalidate" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.HiddenFor(m => m.CollectionEventId)
+
+            <!-- ===== VALIDATION SUMMARY ===== -->
+            @Html.ValidationSummary(true, "", new { @class = "validation-summary-errors" })
+
+            <!-- ===== EVENT NAME ===== -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.Name, "Event Name")
+                @Html.TextBoxFor(m => m.Name, new
+                {
+                    @class = "form-control",
+                    placeholder = "Enter event name...",
+                    autofocus = "autofocus"
+                })
+                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "field-validation-error" })
+            </div>
+
+            <!-- ===== DESCRIPTION ===== -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.Description, "Description")
+                <span class="label-hint">(optional)</span>
+                @Html.TextAreaFor(m => m.Description, new
+                {
+                    @class = "form-control",
+                    rows = "3",
+                    placeholder = "Provide details about this collection event..."
+                })
+                @Html.ValidationMessageFor(m => m.Description, "", new { @class = "field-validation-error" })
+            </div>
+
+            <!-- ===== DATE & END TIME ===== -->
+            <div class="form-row">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EventDate, "Event Date & Start Time")
+                    @Html.TextBoxFor(m => m.EventDate, "{0:yyyy-MM-ddTHH:mm}", new
+                    {
+                        @class = "form-control",
+                        type = "datetime-local"
+                    })
+                    @Html.ValidationMessageFor(m => m.EventDate, "", new { @class = "field-validation-error" })
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.EndTime, "End Time")
+                    <span class="label-hint">(optional)</span>
+                    @Html.TextBoxFor(m => m.EndTime, "{0:yyyy-MM-ddTHH:mm}", new
+                    {
+                        @class = "form-control",
+                        type = "datetime-local"
+                    })
+                    @Html.ValidationMessageFor(m => m.EndTime, "", new { @class = "field-validation-error" })
+                </div>
+            </div>
+
+            <!-- ===== DROP-OFF POINT ===== -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.DropOffPointId, "Drop-Off Point")
+                @Html.DropDownListFor(m => m.DropOffPointId,
+                         new SelectList(dropOffPoints, "DropOffPointId", "Name", Model.DropOffPointId),
+                         "Select a drop-off point...",
+                         new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.DropOffPointId, "", new { @class = "field-validation-error" })
+
+                @if (!dropOffPoints.Any())
+                {
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                        <i class="fa fa-info-circle fa-xs"></i>
+                        No drop-off points available. Please create a drop-off point first.
+                    </div>
+                }
+            </div>
+
+            <!-- ===== MAX REGISTRATIONS ===== -->
+            <div class="form-group">
+                @Html.LabelFor(m => m.MaxRegistrations, "Maximum Registrations")
+                <span class="label-hint">(leave blank for unlimited)</span>
+                @Html.TextBoxFor(m => m.MaxRegistrations, new
+                {
+                    @class = "form-control",
+                    type = "number",
+                    min = "1",
+                    placeholder = "e.g. 50"
+                })
+                @Html.ValidationMessageFor(m => m.MaxRegistrations, "", new { @class = "field-validation-error" })
+            </div>
+
+            <!-- ===== ACTIVE STATUS CHECKBOX ===== -->
+            <div class="check-row">
+                @Html.CheckBoxFor(m => m.IsActive, new { id = "isActiveCheck" })
+                <label for="isActiveCheck">
+                    Event is active (visible to Residents)
+                    <span class="check-hint">— Inactive events are hidden from residents</span>
+                </label>
+            </div>
+
+            <!-- ===== FORM ACTIONS ===== -->
+            <div class="form-actions">
+                <button type="submit" class="btn-srr">
+                    <i class="fa fa-check fa-xs"></i> Save Changes
+                </button>
+                <a href="@Url.Action("Index", "AdminCollectionEvent")" class="btn-srr btn-srr-outline">
+                    <i class="fa fa-times fa-xs"></i> Cancel
+                </a>
+            </div>
+        }
+
+        <!-- ===== DELETE SECTION ===== -->
+        <div class="delete-section">
+            <div class="delete-warning">
+                <i class="fa fa-triangle-exclamation"></i>
+                <span>This action cannot be undone. All registrations will be lost.</span>
+            </div>
+            @using (Html.BeginForm("Delete", "AdminCollectionEvent", new { id = Model.CollectionEventId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-srr btn-srr-danger"
+                        onclick="return confirm('Are you sure you want to permanently delete \'@Model.Name\'?\n\nThis will also remove all associated registrations. This action cannot be undone.');">
+                    <i class="fa fa-trash-can fa-xs"></i> Delete Event
+                </button>
+            }
+        </div>
+    </div>
+</div>
