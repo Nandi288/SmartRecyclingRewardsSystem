@@ -1,0 +1,270 @@
+﻿@model List<SmartRecyclingRewardsSystem.Models.ApplicationUser>
+@using Microsoft.AspNet.Identity
+@{
+    // Sets the browser tab title and tells this view to use the site's shared layout
+    ViewBag.Title = "Manage Users";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        .page-wrap {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        .page-header-simple {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .page-header-simple h1 {
+                font-family: 'Syne',sans-serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+            .page-header-simple p {
+                color: var(--text-muted);
+                font-size: 14px;
+                margin: 4px 0 0 0;
+            }
+
+        .section-card {
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-srr {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .table-srr th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                padding: 12px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+                white-space: nowrap;
+            }
+
+            .table-srr td {
+                padding: 12px 16px;
+                font-size: 13px;
+                border-bottom: 1px solid #f7f7f7;
+                vertical-align: middle;
+            }
+
+            .table-srr tr:last-child td {
+                border-bottom: none;
+            }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-role {
+            background: #eef2ff;
+            color: #3730a3;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .btn-action {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 4px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-deactivate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+            .btn-deactivate:hover {
+                background: #fde68a;
+                color: #92400e;
+            }
+
+        .btn-activate {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+            .btn-activate:hover {
+                background: #bbf7d0;
+                color: #166534;
+            }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+            .btn-delete:hover {
+                background: #fecaca;
+                color: #991b1b;
+            }
+
+        .alert-box {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .alert-success {
+            background: #f8fdf9;
+            border: 1px solid #d4edda;
+            color: #245c42;
+        }
+
+        .alert-error {
+            background: #fdecea;
+            border: 1px solid #f5c2c0;
+            color: #a94442;
+        }
+
+        .alert-info {
+            background: #eef6fc;
+            border: 1px solid #bee3f8;
+            color: #2c5282;
+        }
+
+        .you-tag {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+    </style>
+}
+
+<div class="page-wrap">
+
+    @* Page title *@
+    <div class="page-header-simple">
+        <div>
+            <h1>Manage Users</h1>
+            <p>View residents, officers, and admins. Deactivate or delete accounts as needed.</p>
+        </div>
+    </div>
+
+    @* Feedback messages set by the controller after an action (deactivate/activate/delete) *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert-box alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Info"] != null)
+    {
+        <div class="alert-box alert-info">@TempData["Info"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert-box alert-error">@TempData["Error"]</div>
+    }
+
+    @* Main table listing every user *@
+    <div class="section-card">
+        <table class="table-srr">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Points</th>
+                    <th>Date Joined</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@u.FullName</strong>
+                            @* Label the currently logged-in admin so they know it's their own row *@
+                            @if (u.Id == User.Identity.GetUserId())
+                            {
+                                <span class="you-tag">(You)</span>
+                            }
+                        </td>
+                        <td>@u.Email</td>
+                        <td><span class="badge-role">@u.Role</span></td>
+                        <td>@u.PointsBalance</td>
+                        <td>@u.DateJoined.ToString("dd MMM yyyy")</td>
+                        <td>
+                            @if (u.IsActive)
+                            {
+                                <span class="badge-active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge-inactive">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @* Hide action buttons on the admin's own row so they can't self-lock or self-delete *@
+                            @if (u.Id != User.Identity.GetUserId())
+                            {
+                                @* Toggle button: posts to Deactivate or Activate depending on current status *@
+                                using (Html.BeginForm(u.IsActive ? "Deactivate" : "Activate", "UserManagement", new { id = u.Id }, FormMethod.Post, new { style = "display:inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    if (u.IsActive)
+                                    {
+                                        <button type="submit" class="btn-action btn-deactivate"><i class="fa fa-user-slash"></i> Deactivate</button>
+                                    }
+                                    else
+                                    {
+                                        <button type="submit" class="btn-action btn-activate"><i class="fa fa-user-check"></i> Activate</button>
+                                    }
+                                }
+                                <a href="@Url.Action("Delete", new { id = u.Id })" class="btn-action btn-delete"><i class="fa fa-trash"></i> Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -51,6 +51,14 @@ namespace SmartRecyclingRewardsSystem.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            // Block login for deactivated accounts before attempting sign-in
+            var existingUser = await UserManager.FindByEmailAsync(model.Email);
+            if (existingUser != null && !existingUser.IsActive)
+            {
+                ModelState.AddModelError("", "This account has been deactivated. Please contact an administrator.");
+                return View(model);
+            }
+
             var result = await SignInManager.PasswordSignInAsync(
                 model.Email, model.Password, model.RememberMe, shouldLockout: false);
 

@@ -210,6 +210,7 @@
     <Compile Include="Controllers\RecycleController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SystemConfigController.cs" />
+    <Compile Include="Controllers\UserManagementController.cs" />
     <Compile Include="Data\ApplicationDbInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -327,6 +328,8 @@
     <Content Include="Views\AdminCollectionEvent\Index.cshtml" />
     <Content Include="Views\AdminCollectionEvent\Create.cshtml" />
     <Content Include="Views\AdminCollectionEvent\Edit.cshtml" />
+    <Content Include="Views\UserManagement\ListUsers_Index.cshtml" />
+    <Content Include="Views\UserManagement\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
