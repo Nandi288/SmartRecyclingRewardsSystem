@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.Identity;
 using SmartRecyclingRewardsSystem.Models;
+using SmartRecyclingRewardsSystem.Services;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -12,6 +13,12 @@ namespace SmartRecyclingRewardsSystem.Controllers
     public class OfficerController : Controller
     {
         private readonly ApplicationDbContext _db = new ApplicationDbContext();
+        private readonly NotificationService _notificationService;
+
+        public OfficerController()
+        {
+            _notificationService = new NotificationService(_db);
+        }
 
         // ============================================================
         // GET: /Officer/Pending
@@ -151,25 +158,10 @@ namespace SmartRecyclingRewardsSystem.Controllers
             };
             _db.PointTransactions.Add(transaction);
 
-            // Create in-app notification for resident
-            var notification = new Notification
-            {
-                UserId = submission.ResidentId,
-                NotificationType = NotificationType.SubmissionVerified,
-                Title = "Submission Verified ✓",
-                Message = string.Format(
-                    "Your submission of {0} kg of {1} at {2} has been verified. You earned {3} points!",
-                    submission.WeightKg, submission.MaterialType.Name,
-                    submission.DropOffPoint.Name, pointsAwarded),
-                IsRead = false,
-                EmailSent = false,
-                SmsSent = false,
-                RecyclingSubmissionId = submission.RecyclingSubmissionId,
-                CreatedAt = DateTime.Now
-            };
-            _db.Notifications.Add(notification);
-
-            await _db.SaveChangesAsync();
+            // Create in-app notification for resident, and send them an email.
+            // This also saves all the changes made above (submission status,
+            // points balance, point transaction) in the same SaveChanges call.
+            await _notificationService.NotifyVerifiedAsync(resident, submission);
 
             TempData["Success"] = string.Format(
                 "Submission verified! {0} earned {1} points.",
@@ -210,27 +202,12 @@ namespace SmartRecyclingRewardsSystem.Controllers
             submission.RejectionReason = rejectionReason;
             submission.PointsAwarded = 0;
 
-            // Notify resident
-            var notification = new Notification
-            {
-                UserId = submission.ResidentId,
-                NotificationType = NotificationType.SubmissionRejected,
-                Title = "Submission Rejected",
-                Message = string.Format(
-                    "Your submission of {0} kg of {1} at {2} was rejected. Reason: {3}",
-                    submission.WeightKg, submission.MaterialType.Name,
-                    submission.DropOffPoint.Name, rejectionReason),
-                IsRead = false,
-                EmailSent = false,
-                SmsSent = false,
-                RecyclingSubmissionId = submission.RecyclingSubmissionId,
-                CreatedAt = DateTime.Now
-            };
-            _db.Notifications.Add(notification);
-
-            await _db.SaveChangesAsync();
-
+            // Notify resident: in-app notification + email, and save all
+            // the changes made above (submission status, rejection reason)
+            // in the same SaveChanges call
             var resident = _db.Users.Find(submission.ResidentId);
+            await _notificationService.NotifyRejectedAsync(resident, submission);
+
             TempData["Success"] = string.Format(
                 "Submission from {0} has been rejected.", resident.FullName);
 

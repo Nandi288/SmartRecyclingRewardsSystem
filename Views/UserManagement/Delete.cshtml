@@ -152,11 +152,14 @@
         <div class="confirm-icon"><i class="fa fa-triangle-exclamation"></i></div>
         <h2>Delete @Model.FullName?</h2>
 
-        @* Explains the fallback behaviour so it's not a surprise to the admin *@
+        @* Warns that delete is permanent and wipes related history — no more deactivate-fallback *@
         <div class="warning-box">
-            This action cannot be undone. If this user has any recycling submissions, points history, or event
-            registrations, they will be <strong>deactivated</strong> instead of deleted, so that historical records
-            aren't broken.
+            This action <strong>cannot be undone</strong>. Deleting this user will also permanently remove their
+            recycling submissions, points history, notifications, event registrations, and badges.
+            @if (ViewBag.HasHistory == true)
+            {
+                <text> This user has existing history that will be deleted along with the account.</text>
+            }
         </div>
 
         <div class="detail-box">

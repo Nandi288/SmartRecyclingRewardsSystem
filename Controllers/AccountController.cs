@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using SmartRecyclingRewardsSystem.Data;
 using SmartRecyclingRewardsSystem.Models;
+using SmartRecyclingRewardsSystem.Services;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -12,6 +14,15 @@ namespace SmartRecyclingRewardsSystem.Controllers
     {
         private ApplicationUserManager _userManager;
         private ApplicationSignInManager _signInManager;
+
+        // Used to send the "account created" email once registration succeeds
+        private readonly ApplicationDbContext _db = new ApplicationDbContext();
+        private readonly NotificationService _notificationService;
+
+        public AccountController()
+        {
+            _notificationService = new NotificationService(_db);
+        }
 
         public ApplicationUserManager UserManager
         {
@@ -126,6 +137,9 @@ namespace SmartRecyclingRewardsSystem.Controllers
                     // Assign the chosen role
                     await UserManager.AddToRoleAsync(user.Id, model.Role);
 
+                    // Send the "account created" email/notification
+                    await _notificationService.NotifyAccountCreatedAsync(user);
+
                     // Sign them in immediately
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
@@ -156,6 +170,16 @@ namespace SmartRecyclingRewardsSystem.Controllers
             if (Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);
             return RedirectToAction("Index", "Home");
+        }
+
+        // Cleans up the database connection this controller opened
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _db.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

@@ -330,6 +330,7 @@
     <Content Include="Views\AdminCollectionEvent\Edit.cshtml" />
     <Content Include="Views\UserManagement\ListUsers_Index.cshtml" />
     <Content Include="Views\UserManagement\Delete.cshtml" />
+    <Content Include="Views\UserManagement\_UserRow.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

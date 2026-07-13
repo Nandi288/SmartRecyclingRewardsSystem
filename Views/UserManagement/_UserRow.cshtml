@@ -1,0 +1,56 @@
+﻿@model SmartRecyclingRewardsSystem.Models.ApplicationUser
+@using Microsoft.AspNet.Identity
+@{
+    // ShowPoints is passed in from the parent view via ViewData.
+    // true  -> render the Points column (used for Residents)
+    // false -> skip it (used for Admins and Collection Officers)
+    bool showPoints = ViewData["ShowPoints"] != null && (bool)ViewData["ShowPoints"];
+}
+
+<tr class="role-row">
+    <td>
+        <strong>@Model.FullName</strong>
+        @* Label the currently logged-in admin so they know it's their own row *@
+        @if (Model.Id == User.Identity.GetUserId())
+        {
+            <span class="you-tag">(You)</span>
+        }
+    </td>
+    <td>@Model.Email</td>
+    <td><span class="badge-role">@Model.Role</span></td>
+    @if (showPoints)
+    {
+        <td>@Model.PointsBalance</td>
+    }
+    <td>@Model.DateJoined.ToString("dd MMM yyyy")</td>
+    <td>
+        @if (Model.IsActive)
+        {
+            <span class="badge-active">Active</span>
+        }
+        else
+        {
+            <span class="badge-inactive">Inactive</span>
+        }
+    </td>
+    <td>
+        @* Hide action buttons on the admin's own row so they can't self-lock or self-delete *@
+        @if (Model.Id != User.Identity.GetUserId())
+        {
+            @* Toggle button: posts to Deactivate or Activate depending on current status *@
+            using (Html.BeginForm(Model.IsActive ? "Deactivate" : "Activate", "UserManagement", new { id = Model.Id }, FormMethod.Post, new { style = "display:inline;" }))
+            {
+                @Html.AntiForgeryToken()
+                if (Model.IsActive)
+                {
+                    <button type="submit" class="btn-action btn-deactivate"><i class="fa fa-user-slash"></i> Deactivate</button>
+                }
+                else
+                {
+                    <button type="submit" class="btn-action btn-activate"><i class="fa fa-user-check"></i> Activate</button>
+                }
+            }
+            <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn-action btn-delete"><i class="fa fa-trash"></i> Delete</a>
+        }
+    </td>
+</tr>

@@ -3,12 +3,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SmartRecyclingRewardsSystem.Models
 {
+    // Every kind of notification/email the system can send.
+    // The 3 new values at the bottom were added to support:
+    //  - AccountCreated            → welcome email when a Resident/Officer registers
+    //  - SubmissionReceived        → confirmation email when a Resident logs recycling
+    //  - PendingVerificationAlert  → alert email to the Officer who needs to verify it
     public enum NotificationType
     {
         SubmissionVerified = 0,
         SubmissionRejected = 1,
         GeneralAnnouncement = 2,
-        RewardRedeemed = 3
+        RewardRedeemed = 3,
+        AccountCreated = 4,
+        SubmissionReceived = 5,
+        PendingVerificationAlert = 6
     }
 
     public class Notification
