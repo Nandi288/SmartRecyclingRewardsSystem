@@ -1,0 +1,32 @@
+@model SmartRecyclingRewardsSystem.ViewModels.LeaderboardPageViewModel
+
+@{
+    ViewBag.Title = "Community Leaderboard";
+}
+
+<h2>Community Leaderboard</h2>
+
+<div>
+    <button type="button" onclick="showTab('monthly')" id="btn-monthly" class="leaderboard-tab-btn active">This Month</button>
+    <button type="button" onclick="showTab('allTime')" id="btn-allTime" class="leaderboard-tab-btn">All Time</button>
+</div>
+
+<div id="monthly" class="leaderboard-tab-panel">
+    @{ Html.RenderPartial("_LeaderboardTable", Model.MonthlyRankings); }
+</div>
+
+<div id="allTime" class="leaderboard-tab-panel" style="display:none;">
+    @{ Html.RenderPartial("_LeaderboardTable", Model.AllTimeRankings); }
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.getElementById('monthly').style.display = 'none';
+        document.getElementById('allTime').style.display = 'none';
+        document.getElementById(tabId).style.display = 'block';
+
+        document.getElementById('btn-monthly').classList.remove('active');
+        document.getElementById('btn-allTime').classList.remove('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+    }
+</script>
