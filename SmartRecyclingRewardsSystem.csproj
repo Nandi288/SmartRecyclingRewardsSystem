@@ -205,6 +205,7 @@
     <Compile Include="Controllers\ImpactController.cs" />
     <Compile Include="Controllers\LocationsController.cs" />
     <Compile Include="Controllers\MaterialTypeController.cs" />
+    <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\OfficerController.cs" />
     <Compile Include="Controllers\PointsController.cs" />
     <Compile Include="Controllers\RecycleController.cs" />
@@ -225,6 +226,7 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\MaterialType.cs" />
     <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\NotificationViewModel.cs" />
     <Compile Include="Models\PointTransaction.cs" />
     <Compile Include="Models\RecyclingSubmission.cs" />
     <Compile Include="Models\SystemConfig.cs" />
@@ -331,6 +333,7 @@
     <Content Include="Views\UserManagement\ListUsers_Index.cshtml" />
     <Content Include="Views\UserManagement\Delete.cshtml" />
     <Content Include="Views\UserManagement\_UserRow.cshtml" />
+    <Content Include="Views\Notification\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
