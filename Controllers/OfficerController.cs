@@ -14,10 +14,12 @@ namespace SmartRecyclingRewardsSystem.Controllers
     {
         private readonly ApplicationDbContext _db = new ApplicationDbContext();
         private readonly NotificationService _notificationService;
+        private readonly BadgeService _badgeService;
 
         public OfficerController()
         {
             _notificationService = new NotificationService(_db);
+            _badgeService = new BadgeService();
         }
 
         // ============================================================
@@ -163,11 +165,18 @@ namespace SmartRecyclingRewardsSystem.Controllers
             // points balance, point transaction) in the same SaveChanges call.
             await _notificationService.NotifyVerifiedAsync(resident, submission);
 
+            // Check badge criteria now that this submission is verified (UC-14)
+            var newBadges = _badgeService.CheckAndAwardBadges(submission.ResidentId);
+            foreach (var badge in newBadges)
+            {
+                await _notificationService.NotifyBadgeEarnedAsync(resident, badge);
+            }
+
             TempData["Success"] = string.Format(
                 "Submission verified! {0} earned {1} points.",
                 resident.FullName, pointsAwarded);
 
-            return RedirectToAction("Pending");
+            return RedirectToAction("Pending"); ;
         }
 
         // ============================================================
