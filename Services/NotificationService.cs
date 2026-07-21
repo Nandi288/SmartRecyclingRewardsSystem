@@ -172,6 +172,34 @@ namespace SmartRecyclingRewardsSystem.Services
         }
 
         // ============================================================
+        // Sent to a Resident when they earn a new badge, right after a
+        // submission is verified (called from OfficerController.ConfirmVerify,
+        // via BadgeService.CheckAndAwardBadges — UC-14)
+        // ============================================================
+        public async Task NotifyBadgeEarnedAsync(ApplicationUser resident, Badge badge)
+        {
+            var plainMessage = string.Format(
+                "Congratulations! You've earned the '{0}' badge: {1}",
+                badge.Name, badge.Description);
+
+            var details = new List<string[]>
+    {
+        new[] { "Badge", badge.Name },
+        new[] { "Description", badge.Description ?? "" },
+        new[] { "Earned On", DateTime.Now.ToString("dd MMM yyyy") }
+    };
+
+            var html = BuildEmailHtml(
+                "New Badge Earned!",
+                string.Format("Well done, {0}! Your recycling efforts just earned you a new badge.", resident.FirstName),
+                details,
+                "View My Badges", "/Dashboard");
+
+            await CreateAndSendAsync(resident, NotificationType.BadgeEarned,
+                "New Badge Earned: " + badge.Name, plainMessage, html);
+        }
+
+        // ============================================================
         // Shared helper: creates the in-app Notification row, and sends
         // an email (and SMS, if the user opted in) for every event above.
         // "plainMessage" is stored in the database for the in-app bell

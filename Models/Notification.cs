@@ -16,7 +16,9 @@ namespace SmartRecyclingRewardsSystem.Models
         RewardRedeemed = 3,
         AccountCreated = 4,
         SubmissionReceived = 5,
-        PendingVerificationAlert = 6
+        PendingVerificationAlert = 6,
+        BadgeEarned = 7
+
     }
 
     public class Notification
