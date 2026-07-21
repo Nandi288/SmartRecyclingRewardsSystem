@@ -1,0 +1,89 @@
+﻿@model IEnumerable<SmartRecyclingRewardsSystem.Models.Reward>
+@{
+    ViewBag.Title = "Rewards";
+    var resident = ViewBag.Resident as SmartRecyclingRewardsSystem.Models.ApplicationUser;
+    int balance = ViewBag.PointsBalance;
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Rewards Catalogue</h2>
+            <p class="text-muted mb-0">Redeem your points for real-world rewards.</p>
+        </div>
+        <div class="text-right">
+            <div class="text-muted small">Your Balance</div>
+            <div class="h3 mb-0 text-success">@balance <small>pts</small></div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var reward in Model)
+        {
+            bool canAfford = balance >= reward.PointsCost;
+
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card h-100 shadow-sm @(canAfford ? "" : "border-secondary")">
+                    <img src="@Url.Content(reward.ImageUrl)"
+                         class="card-img-top"
+                         alt="@reward.Name"
+                         style="height: 160px; object-fit: cover;"
+                         onerror="this.src='@Url.Content("~/Content/images/rewards/placeholder.png")';" />
+
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">@reward.Name</h5>
+                        <p class="card-text text-muted small flex-grow-1">@reward.Description</p>
+
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge badge-success p-2">
+                                <i class="fa fa-leaf"></i> @reward.PointsCost pts
+                            </span>
+                        </div>
+
+                        @using (Html.BeginForm("Redeem", "Rewards", FormMethod.Post))
+                        {
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@reward.RewardId" />
+
+                            if (canAfford)
+                            {
+                                <button type="submit" class="btn btn-success btn-block"
+                                        onclick="return confirm('Redeem &quot;@reward.Name&quot; for @reward.PointsCost points?');">
+                                    Redeem
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-outline-secondary btn-block" disabled>
+                                    Need @(reward.PointsCost - balance) more pts
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No rewards are available right now. Check back soon!</div>
+    }
+
+</div>

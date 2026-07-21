@@ -100,6 +100,8 @@ namespace SmartRecyclingRewardsSystem.Models
         public DbSet<Badge> Badges { get; set; }
         public DbSet<UserBadge> UserBadges { get; set; }
         public DbSet<SystemConfig> SystemConfigs { get; set; }
+        public DbSet<Reward> Rewards { get; set; }
+        public DbSet<RewardRedemption> RewardRedemptions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -160,6 +162,8 @@ namespace SmartRecyclingRewardsSystem.Models
             modelBuilder.Entity<UserBadge>()
                 .HasIndex(b => new { b.UserId, b.BadgeId })
                 .IsUnique();
+
+
 
             modelBuilder.Entity<MaterialType>()
                 .Property(m => m.PointsPerKg).HasPrecision(10, 2);
