@@ -1,18 +1,26 @@
-﻿using SmartRecyclingRewardsSystem.Models;
+﻿// iTextSharp for PDF
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+// EPPlus for Excel
+using OfficeOpenXml;
+using OfficeOpenXml.Drawing;
+using OfficeOpenXml.Drawing.Chart;
+using OfficeOpenXml.Style;
+using SmartRecyclingRewardsSystem.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Web.Helpers;
 using System.Web.Mvc;
 
-// iTextSharp for PDF
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-
-// EPPlus for Excel
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
+using System.Windows.Forms.DataVisualization.Charting;
+using Chart = System.Windows.Forms.DataVisualization.Charting.Chart;
+using Color = System.Drawing.Color;
+using ColorTranslator = System.Drawing.ColorTranslator;
+using Font = System.Drawing.Font;
+using FontStyle = System.Drawing.FontStyle;
 
 namespace SmartRecyclingRewardsSystem.Controllers
 {
@@ -153,6 +161,55 @@ namespace SmartRecyclingRewardsSystem.Controllers
             };
         }
 
+        // ── Renders a bar chart of weight-by-material as a PNG, for embedding in the PDF ──
+        private byte[] GenerateMaterialChartImage(CommunityReportViewModel report)
+        {
+            using (var chart = new Chart())
+            {
+                chart.Width = 700;
+                chart.Height = 350;
+                chart.BackColor = Color.White;
+
+                var chartArea = new ChartArea("MainArea");
+                chartArea.AxisX.MajorGrid.LineColor = Color.FromArgb(235, 235, 235);
+                chartArea.AxisY.MajorGrid.LineColor = Color.FromArgb(235, 235, 235);
+                chartArea.AxisX.LabelStyle.Font = new Font("Arial", 9);
+                chartArea.AxisY.LabelStyle.Font = new Font("Arial", 9);
+                chart.ChartAreas.Add(chartArea);
+
+                var series = new Series("Weight (kg)")
+                {
+                    ChartType = SeriesChartType.Column,
+                    IsValueShownAsLabel = true,
+                    Font = new Font("Arial", 8)
+                };
+                chart.Series.Add(series);
+
+                for (int i = 0; i < report.ByMaterial.Count; i++)
+                {
+                    var m = report.ByMaterial[i];
+                    series.Points.AddXY(m.MaterialName, m.TotalWeightKg);
+
+                    series.Points[i].Color = string.IsNullOrWhiteSpace(m.ColourCode)
+                        ? ColorTranslator.FromHtml("#2d6a4f")   // fallback to brand green if a material has no colour set
+                        : ColorTranslator.FromHtml(m.ColourCode);
+                }
+
+                chart.Titles.Add(new Title
+                {
+                    Text = "Recycling Volume by Material Type (kg)",
+                    Font = new Font("Arial", 11, FontStyle.Bold),
+                    ForeColor = ColorTranslator.FromHtml("#1a3a2a")
+                });
+
+                using (var ms = new MemoryStream())
+                {
+                    chart.SaveImage(ms, ChartImageFormat.Png);
+                    return ms.ToArray();
+                }
+            }
+        }
+
         // ── PDF Generator (iTextSharp) ─────────────────────────────────
         private byte[] GeneratePdf(CommunityReportViewModel report)
         {
@@ -235,8 +292,8 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 // ── Material breakdown table ───────────────────────
                 doc.Add(new Paragraph("Recycling by Material Type", headingFont) { SpacingAfter = 6f });
 
-                var matTable = new PdfPTable(5) { WidthPercentage = 100 };
-                matTable.SetWidths(new float[] { 2.5f, 1.5f, 1.5f, 1.5f, 1f });
+                var matTable = new PdfPTable(6) { WidthPercentage = 100 };
+                matTable.SetWidths(new float[] { 0.5f, 2.3f, 1.4f, 1.4f, 1.4f, 1f });
 
                 Action<string, bool> addMatHeader = (text, last) => {
                     matTable.AddCell(new PdfPCell(new Phrase(text, whiteFont))
@@ -247,16 +304,25 @@ namespace SmartRecyclingRewardsSystem.Controllers
                     });
                 };
 
+                addMatHeader("", false);         
                 addMatHeader("Material", false);
                 addMatHeader("Weight (kg)", false);
                 addMatHeader("CO₂ Saved (kg)", false);
                 addMatHeader("Points Awarded", false);
                 addMatHeader("Submissions", true);
-
                 bool alt = false;
                 foreach (var row in report.ByMaterial)
                 {
                     var bg = alt ? greenLight : BaseColor.WHITE;
+
+                    var swatchCell = new PdfPCell
+                    {
+                        BackgroundColor = HexToBaseColor(row.ColourCode),
+                        Padding = 7f,
+                        Border = Rectangle.NO_BORDER
+                    };
+                    matTable.AddCell(swatchCell);
+
                     Action<string> addCell = (text) => {
                         matTable.AddCell(new PdfPCell(new Phrase(text, bodyFont))
                         {
@@ -274,6 +340,17 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 }
                 doc.Add(matTable);
                 doc.Add(new Paragraph(" "));
+
+                // ── Material breakdown chart ────────────────────────
+                if (report.ByMaterial.Any())
+                {
+                    var chartBytes = GenerateMaterialChartImage(report);
+                    var chartImage = iTextSharp.text.Image.GetInstance(chartBytes);
+                    chartImage.ScaleToFit(500f, 250f);
+                    chartImage.Alignment = Element.ALIGN_CENTER;
+                    chartImage.SpacingAfter = 12f;
+                    doc.Add(chartImage);
+                }
 
                 // ── Top residents table ────────────────────────────
                 if (report.TopResidents.Any())
@@ -320,6 +397,7 @@ namespace SmartRecyclingRewardsSystem.Controllers
         }
 
         // ── Excel Generator (EPPlus) ───────────────────────────────────
+        
         private byte[] GenerateExcel(CommunityReportViewModel report)
         {
             ExcelPackage.License.SetNonCommercialPersonal("EcoRewards SA");
@@ -381,7 +459,7 @@ namespace SmartRecyclingRewardsSystem.Controllers
 
                 // ── Sheet 2: By Material ───────────────────────────
                 var matSheet = package.Workbook.Worksheets.Add("By Material");
-                var matHeaders = new[] { "Material", "Weight (kg)", "CO₂ Saved (kg)", "Points Awarded", "Submissions" };
+                var matHeaders = new[] { "Material", "Weight (kg)", "CO₂ Saved (kg)", "Points Awarded", "Submissions", "Colour" };
 
                 for (int i = 0; i < matHeaders.Length; i++)
                 {
@@ -401,6 +479,13 @@ namespace SmartRecyclingRewardsSystem.Controllers
                     matSheet.Cells[row, 4].Value = m.TotalPoints;
                     matSheet.Cells[row, 5].Value = m.SubmissionCount;
 
+                    // Colour swatch cell — filled block matching this material's system colour
+                    var swatchColor = string.IsNullOrWhiteSpace(m.ColourCode)
+                        ? greenMid
+                        : System.Drawing.ColorTranslator.FromHtml(m.ColourCode);
+                    matSheet.Cells[row, 6].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
+                    matSheet.Cells[row, 6].Style.Fill.BackgroundColor.SetColor(swatchColor);
+
                     if (row % 2 == 0)
                     {
                         matSheet.Cells[row, 1, row, 5].Style.Fill.PatternType = OfficeOpenXml.Style.ExcelFillStyle.Solid;
@@ -409,6 +494,25 @@ namespace SmartRecyclingRewardsSystem.Controllers
                     row++;
                 }
                 matSheet.Cells[matSheet.Dimension.Address].AutoFitColumns();
+
+                // ── Native Excel chart: weight by material ─────────
+                if (report.ByMaterial.Any())
+                {
+                    var lastDataRow = row - 1;
+
+                    var barChart = matSheet.Drawings.AddChart("WeightByMaterialChart", eChartType.ColumnClustered);
+                    barChart.Title.Text = "Recycling Volume by Material Type (kg)";
+                    barChart.SetPosition(1, 0, 8, 0);
+                    barChart.SetSize(600, 350);
+
+                    var series = barChart.Series.Add(
+                        matSheet.Cells[2, 2, lastDataRow, 2],
+                        matSheet.Cells[2, 1, lastDataRow, 1]);
+                    series.Header = "Weight (kg)";
+
+                    barChart.VaryColors = true;
+                    barChart.Legend.Position = eLegendPosition.Bottom;
+                }
 
                 // ── Sheet 3: Top Residents ─────────────────────────
                 var resSheet = package.Workbook.Worksheets.Add("Top Residents");
@@ -443,6 +547,17 @@ namespace SmartRecyclingRewardsSystem.Controllers
 
                 return package.GetAsByteArray();
             }
+        }
+        private BaseColor HexToBaseColor(string hex)
+        {
+            if (string.IsNullOrWhiteSpace(hex)) return new BaseColor(107, 124, 110); // muted grey fallback
+            hex = hex.TrimStart('#');
+            if (hex.Length != 6) return new BaseColor(107, 124, 110);
+
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+            return new BaseColor(r, g, b);
         }
 
         protected override void Dispose(bool disposing)
