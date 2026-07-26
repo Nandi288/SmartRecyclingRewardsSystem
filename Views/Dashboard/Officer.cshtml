@@ -315,7 +315,7 @@
     <div class="section-card">
         <div class="section-head">
             <h2><i class="fa fa-hourglass-half fa-sm"></i> Pending Submissions</h2>
-            <a href="@Url.Action("Pending","RecyclingSubmission")" style="font-size:13px;color:var(--green-mid);text-decoration:none;font-weight:500;">View all</a>
+            <a href="@Url.Action("AllSubmissions","Officer")" style="font-size:13px;color:var(--green-mid);text-decoration:none;font-weight:500;">View all</a>
         </div>
 
         @if (pendingSubmissions != null && pendingSubmissions.Count > 0)

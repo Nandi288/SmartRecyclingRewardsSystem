@@ -1,0 +1,412 @@
+@using SmartRecyclingRewardsSystem.Models
+@model List<SmartRecyclingRewardsSystem.Models.CollectionEvent>
+@{
+    ViewBag.Title = "Manage Collection Events";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --green-deep: #1a4d3e;
+            --green-mid: #2d7a5a;
+            --green-bright: #4caf84;
+            --text-dark: #1e1e1e;
+            --text-muted: #6b7280;
+            --danger-text: #991b1b;
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .page-top h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 24px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+        .btn-srr {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--green-mid);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+            .btn-srr:hover {
+                background: #245c42;
+                text-decoration: none;
+                color: #ffffff;
+            }
+
+            .btn-srr:active {
+                transform: scale(0.97);
+            }
+
+        /* ===== TABLE ===== */
+        .evt-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+        }
+
+        .evt-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            min-width: 700px;
+        }
+
+            .evt-table th {
+                background: #f8fdf9;
+                font-size: 11px;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 11px 16px;
+                text-align: left;
+                border-bottom: 1px solid #f0f0f0;
+                white-space: nowrap;
+            }
+
+            .evt-table td {
+                padding: 13px 16px;
+                font-size: 13px;
+                color: var(--text-dark);
+                border-bottom: 1px solid #f7f7f7;
+                vertical-align: middle;
+            }
+
+            .evt-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .evt-table tr.inactive-row td {
+                opacity: 0.55;
+            }
+
+            .evt-table tr:hover td {
+                background: #fafcfa;
+            }
+
+        /* ===== EVENT NAME ===== */
+        .evt-name {
+            font-weight: 700;
+            color: var(--green-deep);
+        }
+
+        /* ===== BADGES ===== */
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-inactive {
+            background: #f3f4f6;
+            color: var(--text-muted);
+        }
+
+        /* ===== ACTION LINKS ===== */
+        .action-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+            .action-links a {
+                color: var(--green-mid);
+                font-size: 12px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+
+                .action-links a:hover {
+                    color: var(--green-deep);
+                    text-decoration: underline;
+                }
+
+            .action-links button {
+                background: none;
+                border: none;
+                padding: 0;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                color: var(--danger-text);
+                transition: color 0.2s ease;
+            }
+
+                .action-links button:hover {
+                    color: #7f1d1d;
+                    text-decoration: underline;
+                }
+
+            .action-links .reactivate-btn {
+                color: var(--green-mid);
+            }
+
+                .action-links .reactivate-btn:hover {
+                    color: var(--green-deep);
+                }
+
+            .action-links .action-divider {
+                color: #e5e7eb;
+                user-select: none;
+            }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+            .empty-state i {
+                font-size: 40px;
+                color: var(--green-bright);
+                margin-bottom: 12px;
+                display: block;
+            }
+
+            .empty-state p {
+                margin-top: 8px;
+            }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 768px) {
+            .evt-table th,
+            .evt-table td {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+
+            .evt-table {
+                min-width: 600px;
+            }
+
+            .page-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .btn-srr {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .evt-table th,
+            .evt-table td {
+                padding: 8px 10px;
+                font-size: 11px;
+            }
+
+            .evt-table {
+                min-width: 500px;
+            }
+
+            .action-links {
+                gap: 6px;
+            }
+
+                .action-links a,
+                .action-links button {
+                    font-size: 11px;
+                }
+        }
+    </style>
+}
+
+<div class="page-wrap">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-top">
+        <h1>
+            <i class="fa fa-calendar-days" style="color: var(--green-mid); margin-right: 8px;"></i>
+            Manage Collection Events
+        </h1>
+        <a href="@Url.Action("Create", "AdminCollectionEvent")" class="btn-srr">
+            <i class="fa fa-plus fa-xs"></i> New Event
+        </a>
+    </div>
+
+    <!-- ===== CONTENT ===== -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa fa-calendar-xmark"></i>
+            <strong>No collection events yet.</strong>
+            <p>Create your first event to get started.</p>
+        </div>
+    }
+    else
+    {
+        <div class="evt-table-wrapper">
+            <table class="evt-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Drop-Off Point</th>
+                        <th>Date</th>
+                        <th>Registrations</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        int regCount = e.Registrations?.Count ?? 0;
+                        bool isActive = e.IsActive;
+
+                        <tr class="@(isActive ? "" : "inactive-row")">
+                            <!-- EVENT NAME -->
+                            <td>
+                                <div class="evt-name">@e.Name</div>
+                                @if (!string.IsNullOrEmpty(e.Description))
+                                {
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                        @(e.Description.Length > 50 ? e.Description.Substring(0, 50) + "..." : e.Description)
+                                    </div>
+                                }
+                            </td>
+
+                            <!-- DROP-OFF POINT -->
+                            <td>
+                                @e.DropOffPoint.Name
+                                @if (!string.IsNullOrEmpty(e.DropOffPoint.City))
+                                {
+                                    <div style="font-size: 11px; color: var(--text-muted);">
+                                        @e.DropOffPoint.City
+                                    </div>
+                                }
+                            </td>
+
+                            <!-- DATE -->
+                            <td>
+                                @e.EventDate.ToString("dd MMM yyyy")
+                                <div style="font-size: 11px; color: var(--text-muted);">
+                                    @e.EventDate.ToString("HH:mm")
+                                    @if (e.EndTime.HasValue)
+                                    {
+                                        <text> - @e.EndTime.Value.ToString("HH:mm")</text>
+                                    }
+                                </div>
+                            </td>
+
+                            <!-- REGISTRATIONS -->
+                            <td>
+                                <strong>@regCount</strong>
+                                @if (e.MaxRegistrations.HasValue)
+                                {
+                                    <text> / @e.MaxRegistrations</text>
+                                    <div style="font-size: 11px; color: var(--text-muted);">
+                                        @(e.MaxRegistrations - regCount) spots left
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div style="font-size: 11px; color: var(--text-muted);">
+                                        Unlimited spots
+                                    </div>
+                                }
+                            </td>
+
+                            <!-- STATUS -->
+                            <td>
+                                @if (isActive)
+                                {
+                                    <span class="badge-pill badge-active">
+                                        <i class="fa fa-check fa-xs"></i> Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-pill badge-inactive">
+                                        <i class="fa fa-pause fa-xs"></i> Inactive
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td>
+                                <div class="action-links">
+                                    <a href="@Url.Action("Edit", "AdminCollectionEvent", new { id = e.CollectionEventId })">
+                                        <i class="fa fa-pencil fa-xs"></i> Edit
+                                    </a>
+
+                                    <span class="action-divider">|</span>
+
+                                    @if (isActive)
+                                    {
+                                        using (Html.BeginForm("Deactivate", "AdminCollectionEvent", new { id = e.CollectionEventId }, FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit"
+                                                    onclick="return confirm('Are you sure you want to deactivate \'@e.Name\'?\n\nResidents will no longer see this event.')">
+                                                <i class="fa fa-pause fa-xs"></i> Deactivate
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (Html.BeginForm("Reactivate", "AdminCollectionEvent", new { id = e.CollectionEventId }, FormMethod.Post))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="reactivate-btn"
+                                                    onclick="return confirm('Reactivate \'@e.Name\'?')">
+                                                <i class="fa fa-play fa-xs"></i> Reactivate
+                                            </button>
+                                        }
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

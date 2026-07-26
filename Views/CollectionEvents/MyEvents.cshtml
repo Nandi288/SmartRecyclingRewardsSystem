@@ -1,0 +1,289 @@
+@using SmartRecyclingRewardsSystem.Models
+@model List<SmartRecyclingRewardsSystem.Models.CollectionEventRegistration>
+@{
+    ViewBag.Title = "My Registered Events";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --green-deep: #1a4d3e;
+            --green-mid: #2d7a5a;
+            --green-bright: #4caf84;
+            --text-dark: #1e1e1e;
+            --text-muted: #6b7280;
+            --danger-bg: #fee2e2;
+            --danger-border: #fecaca;
+            --danger-text: #991b1b;
+        }
+
+        /* ===== PAGE WRAPPER ===== */
+        .page-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 60px;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+            .page-top h1 {
+                font-family: 'Syne', sans-serif;
+                font-size: 24px;
+                font-weight: 700;
+                color: var(--green-deep);
+                margin: 0;
+            }
+
+            .page-top a {
+                color: var(--green-mid);
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: color 0.2s ease;
+            }
+
+                .page-top a:hover {
+                    color: var(--green-deep);
+                    text-decoration: underline;
+                }
+
+        /* ===== REGISTRATION CARD ===== */
+        .reg-card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+            .reg-card:hover {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                transform: translateY(-1px);
+            }
+
+            .reg-card:last-child {
+                margin-bottom: 0;
+            }
+
+        /* ===== EVENT INFO ===== */
+        .reg-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .reg-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 4px;
+        }
+
+        .reg-detail {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+            .reg-detail:last-child {
+                margin-bottom: 0;
+            }
+
+            .reg-detail i {
+                color: var(--green-mid);
+                width: 18px;
+                text-align: center;
+                margin-right: 4px;
+            }
+
+        /* ===== BADGES ===== */
+        .reg-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #edf7f1;
+            color: var(--green-mid);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+            .reg-badge.past {
+                background: #f3f4f6;
+                color: var(--text-muted);
+            }
+
+        /* ===== BUTTONS ===== */
+        .reg-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-cancel {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            border: 1px solid var(--danger-border);
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+            .btn-cancel:hover {
+                background: #fecaca;
+            }
+
+            .btn-cancel:active {
+                transform: scale(0.97);
+            }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+            .empty-state i {
+                font-size: 40px;
+                color: var(--green-bright);
+                margin-bottom: 12px;
+                display: block;
+            }
+
+            .empty-state p {
+                margin-top: 8px;
+            }
+
+        /* ===== RESPONSIVE ===== */
+        @@media (max-width: 600px) {
+            .page-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .reg-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .reg-actions {
+                justify-content: flex-start;
+                margin-top: 4px;
+            }
+
+            .btn-cancel {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+<div class="page-wrap">
+    <!-- ===== PAGE HEADER ===== -->
+    <div class="page-top">
+        <h1>
+            <i class="fa fa-ticket" style="color: var(--green-mid); margin-right: 8px;"></i>
+            My Registered Events
+        </h1>
+        <a href="@Url.Action("Index", "CollectionEvent")">
+            <i class="fa fa-arrow-left fa-xs"></i> Back to All Events
+        </a>
+    </div>
+
+    <!-- ===== CONTENT ===== -->
+    @if (!Model.Any())
+    {
+        <div class="empty-state">
+            <i class="fa fa-calendar-xmark"></i>
+            <strong>You haven't registered for any events yet.</strong>
+            <p>Browse upcoming events and register to take part.</p>
+        </div>
+    }
+    else
+    {
+        foreach (var r in Model)
+        {
+            bool isPast = r.CollectionEvent.EventDate < DateTime.Now;
+
+            <div class="reg-card">
+                <!-- EVENT INFO -->
+                <div class="reg-info">
+                    <div class="reg-name">@r.CollectionEvent.Name</div>
+                    <div class="reg-detail">
+                        <i class="fa fa-calendar fa-xs"></i>
+                        @r.CollectionEvent.EventDate.ToString("dd MMM yyyy, HH:mm")
+                    </div>
+                    <div class="reg-detail">
+                        <i class="fa fa-location-dot fa-xs"></i>
+                        @r.CollectionEvent.DropOffPoint.Name
+                        @if (!string.IsNullOrEmpty(r.CollectionEvent.DropOffPoint.City))
+                        {
+                            <text>&mdash; @r.CollectionEvent.DropOffPoint.City</text>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(r.CollectionEvent.DropOffPoint.Address))
+                    {
+                        <div class="reg-detail">
+                            <i class="fa fa-map-pin fa-xs"></i>
+                            @r.CollectionEvent.DropOffPoint.Address
+                        </div>
+                    }
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="reg-actions">
+                    @if (isPast)
+                    {
+                        <span class="reg-badge past">
+                            <i class="fa fa-clock-rotate-left fa-xs"></i> Past Event
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="reg-badge">
+                            <i class="fa fa-check fa-xs"></i> Upcoming
+                        </span>
+
+                        <form action="@Url.Action("Cancel", "CollectionEvent", new { id = r.CollectionEventId })" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn-cancel"
+                                    onclick="return confirm('Are you sure you want to cancel your registration for @r.CollectionEvent.Name?');">
+                                <i class="fa fa-xmark fa-xs"></i> Cancel
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>

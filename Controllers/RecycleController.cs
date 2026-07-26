@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using SmartRecyclingRewardsSystem.Data;
 using SmartRecyclingRewardsSystem.Models;
+using SmartRecyclingRewardsSystem.Services;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -13,6 +14,12 @@ namespace SmartRecyclingRewardsSystem.Controllers
     public class RecycleController : Controller
     {
         private readonly ApplicationDbContext _db = new ApplicationDbContext();
+        private readonly NotificationService _notificationService;
+
+        public RecycleController()
+        {
+            _notificationService = new NotificationService(_db);
+        }
 
         // GET: /Recycle/Log
         public ActionResult Log()
@@ -92,20 +99,24 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 _db.RecyclingSubmissions.Add(submission);
                 await _db.SaveChangesAsync();
 
-                var notification = new Notification
+                // Attach the already-loaded related entities so the notification
+                // service can read their names without an extra database round-trip
+                submission.MaterialType = material;
+                submission.DropOffPoint = dropOffPoint;
+
+                // Notify the resident: submission received, pending verification
+                await _notificationService.NotifySubmissionReceivedAsync(user, submission);
+
+                // Notify the collection officer assigned to this drop-off point,
+                // if one has been assigned, that a new submission needs review
+                if (!string.IsNullOrEmpty(dropOffPoint.AssignedOfficerId))
                 {
-                    UserId = userId,
-                    NotificationType = NotificationType.GeneralAnnouncement,
-                    Title = "Submission Received",
-                    Message = $"Your submission of {submission.WeightKg} kg of {material.Name} at {dropOffPoint.Name} is pending verification.",
-                    IsRead = false,
-                    EmailSent = false,
-                    SmsSent = false,
-                    RecyclingSubmissionId = submission.RecyclingSubmissionId,
-                    CreatedAt = DateTime.Now
-                };
-                _db.Notifications.Add(notification);
-                await _db.SaveChangesAsync();
+                    var officer = await _db.Users.FirstOrDefaultAsync(u => u.Id == dropOffPoint.AssignedOfficerId);
+                    if (officer != null)
+                    {
+                        await _notificationService.NotifyOfficerPendingSubmissionAsync(officer, submission, user);
+                    }
+                }
 
                 TempData["Success"] = $"Your recycling submission of {submission.WeightKg} kg of {material.Name} has been logged successfully!";
                 return RedirectToAction("MySubmissions");

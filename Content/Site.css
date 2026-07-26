@@ -18,3 +18,27 @@ select,
 textarea {
     max-width: 280px;
 }
+
+/* Highlights the current logged-in user's row in the leaderboard table */
+.leaderboard-highlight {
+    background-color: #d4f7dc;
+    font-weight: bold;
+}
+
+/* Leaderboard tab buttons (This Month / All Time toggle) */
+.leaderboard-tab-btn {
+    padding: 8px 16px;
+    margin-right: 8px;
+    border: 1px solid #ccc;
+    background: #f5f5f5;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+}
+
+    /* Highlights the currently selected tab button */
+    .leaderboard-tab-btn.active {
+        background: #d4f7dc;
+        font-weight: bold;
+        border-bottom: none;
+    }
+    

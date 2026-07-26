@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNet.Identity
+@using SmartRecyclingRewardsSystem.Models
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -7,7 +9,75 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        .introjs-tooltip {
+            background: #1a3a2a !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            font-family: 'Inter', sans-serif !important;
+            max-width: 320px !important;
+        }
+
+        .introjs-tooltiptext {
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            padding: 4px 2px !important;
+        }
+
+        .introjs-arrow {
+            border-color: #1a3a2a !important;
+        }
+
+        .introjs-button {
+            background: #b7e04a !important;
+            color: #1a3a2a !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+            text-shadow: none !important;
+            padding: 8px 16px !important;
+        }
+
+            .introjs-button:hover {
+                background: #c8f05a !important;
+                color: #1a3a2a !important;
+            }
+
+        .introjs-skipbutton {
+            background: transparent !important;
+            color: rgba(255,255,255,0.6) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+        }
+
+            .introjs-skipbutton:hover {
+                color: #fff !important;
+                border-color: #fff !important;
+            }
+
+        .introjs-bullets .introjs-bullet {
+            background: rgba(255,255,255,0.3) !important;
+        }
+
+            .introjs-bullets .introjs-bullet.active {
+                background: #b7e04a !important;
+            }
+
+        .introjs-helperLayer {
+            border-radius: 8px !important;
+        }
+
+        .introjs-progress {
+            background: rgba(255,255,255,0.15) !important;
+        }
+
+        .introjs-progressbar {
+            background: #b7e04a !important;
+        }
+    </style>
 
     <style>
         :root {
@@ -48,7 +118,7 @@
             align-items: center;
             padding: 0 2rem;
             z-index: 1000;
-            border-bottom: 1px solid rgba(116,198,157,0.15);
+            border-bottom: 1px solid rgba(116, 198, 157, 0.15);
         }
 
             .srr-nav .brand {
@@ -91,7 +161,7 @@
         }
 
             .nav-links a {
-                color: rgba(255,255,255,0.75);
+                color: rgba(255, 255, 255, 0.75);
                 text-decoration: none;
                 font-size: 14px;
                 font-weight: 500;
@@ -102,7 +172,7 @@
 
                 .nav-links a:hover {
                     color: #fff;
-                    background: rgba(255,255,255,0.08);
+                    background: rgba(255, 255, 255, 0.08);
                 }
 
                 .nav-links a.nav-cta {
@@ -117,19 +187,49 @@
                         color: var(--green-deep);
                     }
 
+        /* Notification Bell Styles */
         .nav-bell {
             position: relative;
+            padding: 7px 12px;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
         }
 
-        .nav-badge {
+            .nav-bell:hover {
+                color: #fff;
+            }
+
+        .nav-badge-dot {
             position: absolute;
-            top: 2px;
+            top: 4px;
             right: 6px;
             width: 8px;
             height: 8px;
             background: #ef4444;
             border-radius: 50%;
             border: 1.5px solid var(--green-deep);
+        }
+
+        .nav-badge-count {
+            position: absolute;
+            top: -2px;
+            right: 0px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid var(--green-deep);
+            padding: 0 4px;
         }
 
         .page-body {
@@ -150,17 +250,17 @@
         }
 
             .role-pill.resident {
-                background: rgba(116,198,157,0.2);
+                background: rgba(116, 198, 157, 0.2);
                 color: var(--green-bright);
             }
 
             .role-pill.collectionofficer {
-                background: rgba(183,224,74,0.2);
+                background: rgba(183, 224, 74, 0.2);
                 color: var(--lime);
             }
 
             .role-pill.admin {
-                background: rgba(239,68,68,0.2);
+                background: rgba(239, 68, 68, 0.2);
                 color: #f87171;
             }
 
@@ -191,11 +291,11 @@
 
         .srr-footer {
             background: var(--green-deep);
-            color: rgba(255,255,255,0.5);
+            color: rgba(255, 255, 255, 0.5);
             text-align: center;
             font-size: 13px;
             padding: 20px 2rem;
-            border-top: 1px solid rgba(116,198,157,0.1);
+            border-top: 1px solid rgba(116, 198, 157, 0.1);
         }
 
             .srr-footer a {
@@ -205,7 +305,7 @@
 
         .srr-card {
             background: #fff;
-            border: 1px solid rgba(0,0,0,0.07);
+            border: 1px solid rgba(0, 0, 0, 0.07);
             border-radius: 12px;
             padding: 24px;
         }
@@ -224,7 +324,7 @@
             }
 
             .page-header p {
-                color: rgba(255,255,255,0.6);
+                color: rgba(255, 255, 255, 0.6);
                 font-size: 14px;
                 margin: 0;
             }
@@ -290,13 +390,58 @@
                 color: #fff;
             }
 
-        @@media (max-width: 768px) {
+        /* Mobile Responsive */
+        @@media (max-width: 992px) {
             .srr-nav {
                 padding: 0 1rem;
             }
 
-            .nav-links a:not(.nav-cta) {
+            .nav-links a:not(.nav-cta):not(.nav-bell) {
                 display: none;
+            }
+
+            .nav-links .role-pill {
+                display: none !important;
+            }
+
+            .nav-links {
+                gap: 2px;
+            }
+
+                .nav-links a {
+                    padding: 7px 10px;
+                    font-size: 13px;
+                }
+
+            .nav-bell {
+                padding: 7px 8px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .srr-nav .brand-name {
+                font-size: 14px;
+            }
+
+            .srr-nav .brand-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+
+            .nav-links a.nav-cta {
+                padding: 5px 12px;
+                font-size: 12px;
+            }
+
+            .nav-links a {
+                padding: 5px 8px;
+                font-size: 12px;
+            }
+
+            .nav-bell {
+                font-size: 14px;
+                padding: 5px 6px;
             }
         }
     </style>
@@ -317,11 +462,41 @@
                 if (User.IsInRole("Resident"))
                 {
                     <span class="role-pill resident"><i class="fa fa-house fa-xs"></i> Resident</span>
-                    <a href="@Url.Action("Log", "Recycle")"><i class="fa fa-plus"></i> Log Recycling</a>
-                    <a href="@Url.Action("MySubmissions", "Recycle")">My Submissions</a>
-                    <a href="@Url.Action("Index", "Points")">Points</a>
-                    <a href="@Url.Action("Index", "Locations")">Drop-Offs</a>
-                    <a href="@Url.Action("Index", "Impact")">My Impact</a>
+                    <a id="tourLog" href="@Url.Action("Log", "Recycle")"
+                       data-intro="Start here! Scan a QR code at your drop-off point to log what you've recycled." data-step="1">
+                        <i class="fa fa-plus"></i> Log Recycling
+                    </a>
+                    <a id="tourSubmissions" href="@Url.Action("MySubmissions", "Recycle")"
+                       data-intro="See every submission you've made and whether it's Pending, Verified, or Rejected." data-step="2">
+                        My Submissions
+                    </a>
+                    <a id="tourPoints" href="@Url.Action("Index", "Points")"
+                       data-intro="Track your points balance and see your full history of earning and spending." data-step="3">
+                        Points
+                    </a>
+                    <a id="tourRewards" href="@Url.Action("Index", "Rewards")"
+                       data-intro="Once you've got enough points, redeem them here for airtime, vouchers, and more." data-step="4">
+                        <i class="fa fa-gift fa-xs"></i> Rewards
+                    </a>
+                    <a id="tourLeaderboard" href="@Url.Action("Index", "LeaderBoard")"
+                       data-intro="See how your recycling compares to other residents this month and all-time." data-step="5">
+                        <i class="fa fa-ranking-star fa-xs"></i> Leaderboard
+                    </a>
+                    <a id="tourDropoffs" href="@Url.Action("Index", "Locations")"
+                       data-intro="Find drop-off points and upcoming collection events near you." data-step="6">
+                        Drop-Offs
+                    </a>
+                    <a id="tourEvents" href="@Url.Action("Index", "CollectionEvents")"
+                       data-intro="Register for community collection drives happening near you." data-step="7">
+                        <i class="fa fa-calendar-days"></i> Events
+                    </a>
+                    <a id="tourImpact" href="@Url.Action("Index", "Impact")"
+                       data-intro="See your personal environmental impact — total CO₂ saved by recycling." data-step="8">
+                        My Impact
+                    </a>
+                    <a href="#" onclick="startResidentTour(); return false;" style="color:#b7e04a;">
+                        <i class="fa fa-circle-question fa-xs"></i> Tour
+                    </a>
                 }
                 else if (User.IsInRole("CollectionOfficer"))
                 {
@@ -337,8 +512,42 @@
                     <a href="@Url.Action("Admin", "Dashboard")">Dashboard</a>
                     <a href="@Url.Action("Index", "MaterialType")">Materials</a>
                     <a href="@Url.Action("Index", "DropOffPoint")">Drop-Off Points</a>
+                    <a href="@Url.Action("Index", "AdminCollectionEvent")">Events</a>
                     <a href="@Url.Action("Index", "Report")">Reports</a>
                 }
+
+                <!-- Notification Bell -->
+                <a href="@Url.Action("Index", "Notification")" class="nav-bell" id="notificationBell">
+                    <i class="fa-regular fa-bell"></i>
+                    @{
+                        var unreadCount = 0;
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            try
+                            {
+                                var userId = User.Identity.GetUserId();
+                                if (!string.IsNullOrEmpty(userId))
+                                {
+                                    using (var db = new ApplicationDbContext())
+                                    {
+                                        unreadCount = db.Notifications.Count(n => n.UserId == userId && !n.IsRead);
+                                    }
+                                }
+                            }
+                            catch { /* Ignore DB errors on initial load */ }
+                        }
+                    }
+                    @if (unreadCount > 0)
+                    {
+                        <span class="nav-badge-dot"></span>
+                        <span class="nav-badge-count" id="unreadCount">@(unreadCount > 99 ? "99+" : unreadCount.ToString())</span>
+                    }
+                    else
+                    {
+                        <span class="nav-badge-dot" style="display:none;"></span>
+                        <span class="nav-badge-count" id="unreadCount" style="display:none;">0</span>
+                    }
+                </a>
 
                 <form id="logoutForm" action="@Url.Action("LogOff", "Account")" method="post" style="display:inline;">
                     @Html.AntiForgeryToken()
@@ -388,6 +597,68 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Function to update unread count in the navbar
+            function updateUnreadCount() {
+                $.ajax({
+                    url: '@Url.Action("GetUnreadCount", "Notification")',
+                    type: 'GET',
+                    success: function (response) {
+                        var dot = $('.nav-badge-dot');
+                        var count = $('#unreadCount');
+
+                        if (response.unreadCount > 0) {
+                            dot.show();
+                            count.show().text(response.unreadCount > 99 ? '99+' : response.unreadCount);
+                        } else {
+                            dot.hide();
+                            count.hide();
+                        }
+                    },
+                    error: function () {
+                        // Silently fail - don't disrupt user experience
+                    }
+                });
+            }
+
+            // Poll for new notifications every 60 seconds
+            var pollInterval = setInterval(updateUnreadCount, 60000);
+
+            // Update unread count when page loads
+            updateUnreadCount();
+
+            // Clean up interval when page unloads
+            $(window).on('beforeunload', function () {
+                clearInterval(pollInterval);
+            });
+        });
+
+        // ── Interactive Resident nav tour (Intro.js) ─────────────
+        function startResidentTour() {
+            introJs().setOptions({
+                nextLabel: 'Next →',
+                prevLabel: '← Back',
+                skipLabel: 'Skip',
+                doneLabel: 'Got it!',
+                exitOnOverlayClick: false,
+                showBullets: true
+            }).start();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var isResident = document.getElementById('tourLog') !== null;
+            var alreadySeenTour = localStorage.getItem('ecorewards_tour_seen') === 'true';
+
+            if (isResident && !alreadySeenTour) {
+                startResidentTour();
+                localStorage.setItem('ecorewards_tour_seen', 'true');
+            }
+        });
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>
