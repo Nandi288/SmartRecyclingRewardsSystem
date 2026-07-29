@@ -239,6 +239,10 @@
     <Compile Include="Migrations\202607211928326_AddTopRecyclerBadgeAndRewards.Designer.cs">
       <DependentUpon>202607211928326_AddTopRecyclerBadgeAndRewards.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.cs" />
+    <Compile Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.Designer.cs">
+      <DependentUpon>202607280946395_AddVerifiedWeightToSubmissions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModel.cs" />
     <Compile Include="Models\Badge.cs" />
@@ -407,6 +411,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202607211928326_AddTopRecyclerBadgeAndRewards.resx">
       <DependentUpon>202607211928326_AddTopRecyclerBadgeAndRewards.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.resx">
+      <DependentUpon>202607280946395_AddVerifiedWeightToSubmissions.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
