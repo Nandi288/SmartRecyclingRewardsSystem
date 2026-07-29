@@ -1,0 +1,92 @@
+﻿@model List<SmartRecyclingRewardsSystem.Models.RewardRedemption>
+
+@{
+    ViewBag.Title = "Redemption History";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="srr-card">
+        <div class="d-flex justify-content-between align-items-center">
+            <h3 style="font-family: 'Syne', sans-serif; color: var(--green-deep);">
+                <i class="fa fa-history" style="color: var(--green-mid);"></i> Redemption History
+            </h3>
+            <a href="@Url.Action("Index")" class="btn-srr btn-sm">
+                <i class="fa fa-gift"></i> Browse Rewards
+            </a>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive mt-3">
+                <table class="table table-hover">
+                    <thead style="background: var(--green-deep); color: #fff;">
+                        <tr>
+                            <th>Reward</th>
+                            <th>Points Spent</th>
+                            <th>Coupon Code</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>
+                                        @if (item.Reward != null)
+                                        {
+                                            @item.Reward.Name
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Unknown Reward</span>
+                                        }
+                                    </strong>
+                                </td>
+                                <td style="color: var(--green-deep); font-weight: 600;">
+                                    -@item.PointsSpent pts
+                                </td>
+                                <td>
+                                    <span style="font-family: 'Courier New', monospace; font-weight: 600; color: var(--green-mid);">
+                                        @if (!string.IsNullOrEmpty(item.CouponCode))
+                                        {
+                                            @item.CouponCode
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.Status == "Completed" ? "badge-verified" : "badge-pending")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td>@item.RedemptionDate.ToString("dd MMM yyyy HH:mm")</td>
+                                <td>
+                                    <a href="@Url.Action("Confirmation", "Rewards", new { id = item.RewardRedemptionId })"
+                                       class="btn-srr btn-sm" style="font-size: 12px; padding: 4px 12px;">
+                                        <i class="fa fa-eye"></i> View Coupon
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fa fa-gift" style="font-size: 48px; color: var(--text-muted);"></i>
+                <h5 class="mt-3">No redemptions yet</h5>
+                <p class="text-muted">Start redeeming rewards to see your history here.</p>
+                <a href="@Url.Action("Index")" class="btn-srr">Browse Rewards</a>
+            </div>
+        }
+    </div>
+</div>

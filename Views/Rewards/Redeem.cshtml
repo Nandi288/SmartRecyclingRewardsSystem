@@ -1,0 +1,72 @@
+﻿<!-- DEBUG: ViewBag.UserPoints = @ViewBag.UserPoints -->
+@model SmartRecyclingRewardsSystem.Models.Reward
+
+@{
+    ViewBag.Title = "Confirm Redemption";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userPoints = ViewBag.UserPoints;
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="srr-card">
+                <h3 style="font-family: 'Syne', sans-serif; color: var(--green-deep);">
+                    <i class="fa fa-shopping-cart" style="color: var(--green-mid);"></i> Confirm Redemption
+                </h3>
+
+                @if (Model != null)
+                {
+                    <!-- Reward Summary -->
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mt-3">
+                        <div>
+                            <h5 style="font-family: 'Syne', sans-serif;">@Model.Name</h5>
+                            <p class="text-muted">@Model.Description</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 20px; font-weight: 700; color: var(--green-mid);">
+                                @Model.PointsCost pts
+                            </div>
+                            <div class="text-muted" style="font-size: 13px;">
+                                You have <strong>@userPoints</strong> pts
+                            </div>
+                        </div>
+                    </div>
+
+                    if (userPoints < Model.PointsCost)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <i class="fa fa-exclamation-circle"></i>
+                            You need @Model.PointsCost points to redeem this reward.
+                            You have @userPoints points.
+                        </div>
+                    }
+
+                    using (Html.BeginForm("ProcessRedemption", "Rewards", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.Hidden("rewardId", Model.RewardId)
+
+                        <div class="alert alert-info mt-3">
+                            <i class="fa fa-info-circle"></i>
+                            You are about to redeem <strong>@Model.Name</strong> for <strong>@Model.PointsCost points</strong>.
+                            <br />
+                            <small class="text-muted">A unique coupon code will be generated for you.</small>
+                        </div>
+
+                        <button type="submit" class="btn-srr mt-4" style="width: 100%; justify-content: center;" @(userPoints < Model.PointsCost ? "disabled" : "")>
+                            <i class="fa fa-check"></i> Confirm Redemption
+                        </button>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-danger">
+                        <i class="fa fa-exclamation-triangle"></i> Reward not found.
+                        <a href="@Url.Action("Index")" class="btn-srr btn-sm">Go Back</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

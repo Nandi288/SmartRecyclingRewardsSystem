@@ -7,7 +7,8 @@ namespace SmartRecyclingRewardsSystem.Models
     {
         Earned = 0,
         Redeemed = 1,
-        Adjusted = 2
+        Adjusted = 2,
+        Redemption
     }
 
     public class PointTransaction
