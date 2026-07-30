@@ -2,6 +2,9 @@
 @{
     ViewBag.Title = "Review Submission";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    // This is only used as a starting reference point in the page - the
+    // real points are calculated live in JavaScript below, based on
+    // whatever actual weight the officer types in.
     var estimatedPoints = (int)Math.Floor(Model.WeightKg * Model.MaterialType.PointsPerKg);
 }
 
@@ -89,6 +92,46 @@
             color: var(--text-dark);
         }
 
+        .weight-input-box {
+            background: #eef6fc;
+            border: 1.5px solid #bee3f8;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+        }
+
+            .weight-input-box label {
+                display: block;
+                font-size: 13px;
+                font-weight: 700;
+                color: #2c5282;
+                margin-bottom: 8px;
+            }
+
+            .weight-input-box input {
+                width: 100%;
+                padding: 12px 14px;
+                border: 1.5px solid #bee3f8;
+                border-radius: 8px;
+                font-size: 16px;
+                font-weight: 600;
+                font-family: 'Inter',sans-serif;
+                color: var(--text-dark);
+                outline: none;
+                box-sizing: border-box;
+            }
+
+                .weight-input-box input:focus {
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+                }
+
+            .weight-input-box .hint {
+                font-size: 12px;
+                color: #4a6a8a;
+                margin-top: 8px;
+            }
+
         .points-preview {
             background: linear-gradient(135deg,#1a3a2a,#2d6a4f);
             border-radius: 10px;
@@ -162,6 +205,11 @@
 
             .btn-verify-big:hover {
                 background: #bbf7d0;
+            }
+
+            .btn-verify-big:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
 
         .reject-section {
@@ -240,7 +288,7 @@
 
         <div class="review-body">
 
-            @* Submission details *@
+            @* Submission details - "Weight" here is clearly the resident's estimate only *@
             <div class="detail-grid">
                 <div class="detail-item">
                     <div class="detail-label">Resident</div>
@@ -252,24 +300,12 @@
                     <div class="detail-value">@Model.MaterialType.Name</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">Weight</div>
+                    <div class="detail-label">Resident's Estimate</div>
                     <div class="detail-value">@Model.WeightKg kg</div>
                 </div>
                 <div class="detail-item">
                     <div class="detail-label">Drop-Off Point</div>
                     <div class="detail-value">@Model.DropOffPoint.Name</div>
-                </div>
-            </div>
-
-            @* Points preview *@
-            <div class="points-preview">
-                <div>
-                    <div class="points-preview-label">Points that will be awarded if verified</div>
-                    <div class="points-preview-sub">@Model.WeightKg kg × @Model.MaterialType.PointsPerKg pts/kg</div>
-                </div>
-                <div style="text-align:right;">
-                    <div class="points-preview-num">@estimatedPoints</div>
-                    <div class="points-preview-sub">points</div>
                 </div>
             </div>
 
@@ -288,12 +324,34 @@
             <div class="action-section">
                 <h3>Your Decision</h3>
 
-                <form action="@Url.Action("ConfirmVerify","Officer", new { id = Model.RecyclingSubmissionId })" method="post">
+                <form id="verifyForm" action="@Url.Action("ConfirmVerify","Officer", new { id = Model.RecyclingSubmissionId })" method="post">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn-verify-big"
-                            onclick="return confirm('Verify this submission and award @estimatedPoints points to @Model.Resident.FirstName?')">
+
+                    @* This is the actual weight the officer sees in front of them.
+                        Points and CO2 saved will be calculated from THIS number,
+                        not from the resident's estimate above. *@
+                    <div class="weight-input-box">
+                        <label><i class="fa fa-weight-scale fa-xs"></i> Actual Weight (kg)</label>
+                        <input type="number" name="actualWeightKg" id="actualWeightKg"
+                               step="0.01" min="0.01" placeholder="Enter the real weight" required
+                               oninput="updatePointsPreview()" />
+                        <div class="hint">This is what points are calculated from - not the resident's estimate.</div>
+                    </div>
+
+                    <div class="points-preview">
+                        <div>
+                            <div class="points-preview-label">Points that will be awarded if verified</div>
+                            <div class="points-preview-sub" id="pointsFormula">Enter actual weight above</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="points-preview-num" id="pointsPreviewNum">0</div>
+                            <div class="points-preview-sub">points</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-verify-big" id="verifyBtn" disabled>
                         <i class="fa fa-circle-check"></i>
-                        Verify — Award @estimatedPoints Points to @Model.Resident.FirstName
+                        <span id="verifyBtnText">Enter actual weight to verify</span>
                     </button>
                 </form>
 
@@ -314,3 +372,41 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        var pointsPerKg = @Model.MaterialType.PointsPerKg;
+        var residentFirstName = @Html.Raw(Json.Encode(Model.Resident.FirstName));
+
+        function updatePointsPreview() {
+            var input = document.getElementById('actualWeightKg');
+            var weight = parseFloat(input.value);
+            var verifyBtn = document.getElementById('verifyBtn');
+            var verifyBtnText = document.getElementById('verifyBtnText');
+            var pointsNum = document.getElementById('pointsPreviewNum');
+            var formula = document.getElementById('pointsFormula');
+
+            if (!weight || weight <= 0) {
+                pointsNum.textContent = '0';
+                formula.textContent = 'Enter actual weight above';
+                verifyBtn.disabled = true;
+                verifyBtnText.textContent = 'Enter actual weight to verify';
+                return;
+            }
+
+            var points = Math.floor(weight * pointsPerKg);
+            pointsNum.textContent = points;
+            formula.textContent = weight + ' kg x ' + pointsPerKg + ' pts/kg';
+            verifyBtn.disabled = false;
+            verifyBtnText.textContent = 'Verify - Award ' + points + ' Points to ' + residentFirstName;
+        }
+
+        document.getElementById('verifyForm').addEventListener('submit', function (e) {
+            var weight = parseFloat(document.getElementById('actualWeightKg').value);
+            var points = Math.floor(weight * pointsPerKg);
+            if (!confirm('Verify this submission with an actual weight of ' + weight + ' kg and award ' + points + ' points to ' + residentFirstName + '?')) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}

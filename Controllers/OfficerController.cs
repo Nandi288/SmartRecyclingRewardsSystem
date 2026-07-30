@@ -113,11 +113,13 @@ namespace SmartRecyclingRewardsSystem.Controllers
 
         // ============================================================
         // POST: /Officer/ConfirmVerify/5
-        // Verifies the submission and awards points
+        // Verifies the submission using the ACTUAL weight the officer
+        // enters (not the resident's estimate), and awards points based
+        // on that real number.
         // ============================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ConfirmVerify(int id)
+        public async Task<ActionResult> ConfirmVerify(int id, decimal actualWeightKg)
         {
             var officerId = User.Identity.GetUserId();
             var submission = await _db.RecyclingSubmissions
@@ -131,11 +133,23 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 return RedirectToAction("Pending");
             }
 
-            // Calculate points and CO2
-            var pointsAwarded = (int)Math.Floor(submission.WeightKg * submission.MaterialType.PointsPerKg);
-            var co2Saved = submission.WeightKg * submission.MaterialType.CO2SavingPerKg;
+            // The officer must enter a real, positive weight - this is a
+            // safety net in case the form's client-side validation was
+            // bypassed somehow.
+            if (actualWeightKg <= 0)
+            {
+                TempData["Error"] = "Please enter a valid actual weight before verifying.";
+                return RedirectToAction("Verify", new { id });
+            }
+
+            // Calculate points and CO2 using the OFFICER'S weight, not the
+            // resident's estimate (submission.WeightKg is left untouched
+            // as a historical record of what the resident guessed).
+            var pointsAwarded = (int)Math.Floor(actualWeightKg * submission.MaterialType.PointsPerKg);
+            var co2Saved = actualWeightKg * submission.MaterialType.CO2SavingPerKg;
 
             // Update submission
+            submission.VerifiedWeightKg = actualWeightKg;
             submission.Status = SubmissionStatus.Verified;
             submission.VerifiedByOfficerId = officerId;
             submission.ProcessedAt = DateTime.Now;
@@ -154,7 +168,7 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 Points = pointsAwarded,
                 BalanceAfter = resident.PointsBalance,
                 Description = string.Format("Verified: {0} kg of {1} at {2}",
-                    submission.WeightKg, submission.MaterialType.Name, submission.DropOffPoint.Name),
+                    actualWeightKg, submission.MaterialType.Name, submission.DropOffPoint.Name),
                 TransactionDate = DateTime.Now,
                 RecyclingSubmissionId = submission.RecyclingSubmissionId
             };
@@ -173,10 +187,10 @@ namespace SmartRecyclingRewardsSystem.Controllers
             }
 
             TempData["Success"] = string.Format(
-                "Submission verified! {0} earned {1} points.",
-                resident.FullName, pointsAwarded);
+                "Submission verified with an actual weight of {0} kg! {1} earned {2} points.",
+                actualWeightKg, resident.FullName, pointsAwarded);
 
-            return RedirectToAction("Pending"); ;
+            return RedirectToAction("Pending");
         }
 
         // ============================================================
