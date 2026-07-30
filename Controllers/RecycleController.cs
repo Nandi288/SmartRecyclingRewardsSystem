@@ -65,8 +65,14 @@ namespace SmartRecyclingRewardsSystem.Controllers
             // the [Required] attribute on ResidentId always fails.
             ModelState.Remove("ResidentId");
 
+            if (model.WeightKg < 5)
+            {
+                ModelState.AddModelError("WeightKg", "Weight must be at least 5 kg.");
+            }
             if (ModelState.IsValid)
             {
+
+
                 var material = _db.MaterialTypes.Find(model.MaterialTypeId);
                 if (material == null)
                 {
@@ -82,6 +88,7 @@ namespace SmartRecyclingRewardsSystem.Controllers
                     PopulateDropdowns();
                     return View(model);
                 }
+            
 
                 var submission = new RecyclingSubmission
                 {
