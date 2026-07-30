@@ -1,0 +1,31 @@
+@model System.Collections.Generic.List<SmartRecyclingRewardsSystem.ViewModels.BadgeCabinetViewModel>
+
+@{
+    ViewBag.Title = "My Badge Cabinet";
+}
+
+<h2>My Badge Cabinet</h2>
+<p>Track the badges you've earned and see how close you are to the next one.</p>
+
+<div class="badge-cabinet-grid">
+    @foreach (var badge in Model)
+    {
+        <div class="badge-card @(badge.IsEarned ? "badge-earned" : "badge-locked")">
+            <div class="badge-icon @(badge.IsEarned ? "icon-earned" : "icon-locked")"></div>
+            <h3>@badge.Name</h3>
+            <p class="badge-description">@badge.Description</p>
+
+            @if (badge.IsEarned)
+            {
+                <p class="badge-earned-date">Earned @badge.EarnedAt.Value.ToString("dd MMM yyyy")</p>
+            }
+            else
+            {
+                <div class="badge-progress-bar">
+                    <div class="badge-progress-fill" style="@("width:" + badge.ProgressPercent + "%;")"></div>
+                </div>
+                <p class="badge-progress-label">@badge.ProgressLabel</p>
+            }
+        </div>
+    }
+</div>

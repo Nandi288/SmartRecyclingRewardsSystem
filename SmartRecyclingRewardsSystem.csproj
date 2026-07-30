@@ -207,6 +207,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminCollectionEventController.cs" />
+    <Compile Include="Controllers\BadgeController.cs" />
     <Compile Include="Controllers\CollectionEventsController.cs" />
     <Compile Include="Controllers\DashboardController.cs" />
     <Compile Include="Controllers\DropOffPointController.cs" />
@@ -276,6 +277,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="ViewModels\CommunityLeaderboardViewModel.cs" />
     <Compile Include="ViewModels\LeaderboardPageViewModel.cs" />
+    <Compile Include="ViewModels\BadgeCabinetViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -378,6 +380,7 @@
     <Content Include="Views\Notification\Index.cshtml" />
     <Content Include="Views\LeaderBoard\Index.cshtml" />
     <Content Include="Views\LeaderBoard\_LeaderBoardTable.cshtml" />
+    <Content Include="Views\Badge\Cabinet.cshtml" />
     <Content Include="Views\Rewards\Index.cshtml" />
     <Content Include="Views\Rewards\Redeem.cshtml" />
     <Content Include="Views\Rewards\Confirmation.cshtml" />
