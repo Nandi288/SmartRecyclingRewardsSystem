@@ -1,11 +1,9 @@
-﻿
-@model IEnumerable<SmartRecyclingRewardsSystem.ViewModels.NotificationViewModel>
+﻿@model IEnumerable<SmartRecyclingRewardsSystem.ViewModels.NotificationViewModel>
 
 @{
     ViewBag.Title = "Notifications";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // Determine the target URL based on user role
     string targetUrl = "#";
     string linkText = "View Details";
 
@@ -24,9 +22,25 @@
         targetUrl = Url.Action("Index", "Admin");
         linkText = "Go to Dashboard";
     }
+
+    // Human-readable labels instead of raw enum names
+    Func<SmartRecyclingRewardsSystem.Models.NotificationType, string> friendlyLabel = (type) =>
+    {
+        switch (type)
+        {
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionVerified: return "Verified";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionRejected: return "Rejected";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionReceived: return "Pending";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.PendingVerificationAlert: return "Officer Alert";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.BadgeEarned: return "Badge";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.AccountCreated: return "Welcome";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.RewardRedeemed: return "Reward";
+            case SmartRecyclingRewardsSystem.Models.NotificationType.GeneralAnnouncement: return "Announcement";
+            default: return "Update";
+        }
+    };
 }
 
-<!-- Page Header -->
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <div>
@@ -50,7 +64,7 @@
     </div>
 </div>
 
-<div class="container-fluid px-4 py-4">
+<div class="container-fluid px-4 py-4" style="max-width: 780px; margin: 0 auto;">
     @if (Model == null || !Model.Any())
     {
         <div class="srr-card text-center py-5 empty-state">
@@ -63,87 +77,67 @@
     }
     else
     {
-        <div class="srr-card p-0 overflow-hidden">
-            <div class="list-group list-group-flush">
-                @foreach (var notification in Model)
-                {
-                    var isUnread = !notification.IsRead;
-                    <div class="list-group-item notification-item @(isUnread ? "unread" : "read")"
-                         data-id="@notification.NotificationId"
-                         data-submission-id="@notification.RecyclingSubmissionId"
-                         data-target-url="@targetUrl"
-                         style="border-left: 4px solid @(isUnread ? "var(--green-mid)" : "transparent");
-                                padding: 16px 20px;
-                                transition: background 0.2s, border-color 0.2s;
-                                cursor: default;">
+        <div class="notif-timeline-wrap">
+            @foreach (var notification in Model)
+            {
+                var isUnread = !notification.IsRead;
 
-                        <div class="d-flex align-items-start gap-3">
-                            <!-- Icon -->
-                            <div class="notification-icon mt-1">
-                                <i class="fa-regular @notification.IconClass @notification.ColorClass"></i>
-                            </div>
+                <div class="notif-row @(isUnread ? "unread" : "")"
+                     data-id="@notification.NotificationId"
+                     data-submission-id="@notification.RecyclingSubmissionId"
+                     data-target-url="@targetUrl">
 
-                            <!-- Content -->
-                            <div class="flex-grow-1 min-width-0">
-                                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <h6 class="mb-1 fw-bold" style="@(isUnread ? "color: var(--text-dark);" : "color: var(--text-muted);")">
-                                            @notification.Title
-                                        </h6>
-                                        <span class="badge @notification.BadgeClass notif-type-badge">
-                                            @notification.NotificationType.ToString()
-                                        </span>
-                                        @if (notification.EmailSent)
-                                        {
-                                            <span class="badge bg-light text-muted notif-channel-badge" title="Email sent">
-                                                <i class="fa-regular fa-envelope"></i>
-                                            </span>
-                                        }
-                                        @if (notification.SmsSent)
-                                        {
-                                            <span class="badge bg-light text-muted notif-channel-badge" title="SMS sent">
-                                                <i class="fa-regular fa-message"></i>
-                                            </span>
-                                        }
-                                    </div>
-                                    <small class="text-muted" style="white-space: nowrap; font-size: 12px;">
-                                        <i class="fa-regular fa-clock me-1"></i> @notification.TimeAgo
-                                    </small>
-                                </div>
-                                <p class="mb-0" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; word-break: break-word;">
-                                    @notification.Message
-                                </p>
+                    <div class="notif-icon-col">
+                        <div class="notif-icon-circle @notification.ColorClass">
+                            <i class="fa-regular @notification.IconClass"></i>
+                        </div>
+                        <div class="notif-line"></div>
+                    </div>
 
-                                <!-- Role-aware navigation link -->
-                                <a href="@targetUrl" class="notif-detail-link">
-                                    @linkText <i class="fa-regular fa-arrow-right ms-1"></i>
-                                </a>
-                            </div>
+                    <div class="notif-card">
+                        <div class="notif-top-row">
+                            <span class="notif-title">@notification.Title</span>
+                            <span class="notif-time"><i class="fa-regular fa-clock"></i> @notification.TimeAgo</span>
+                        </div>
 
-                            <!-- Actions -->
-                            <div class="d-flex align-items-center gap-1">
+                        <p class="notif-message">@notification.Message</p>
+
+                        <div class="notif-bottom-row">
+                            <span class="notif-pill @notification.BadgeClass">@friendlyLabel(notification.NotificationType)</span>
+
+                            @if (notification.EmailSent)
+                            {
+                                <span class="notif-channel-icon" title="Email sent"><i class="fa-regular fa-envelope"></i></span>
+                            }
+                            @if (notification.SmsSent)
+                            {
+                                <span class="notif-channel-icon" title="SMS sent"><i class="fa-regular fa-message"></i></span>
+                            }
+
+                            <a href="@targetUrl" class="notif-detail-link">
+                                @linkText <i class="fa-regular fa-arrow-right"></i>
+                            </a>
+
+                            <div class="notif-actions">
                                 @if (isUnread)
                                 {
-                                    <button class="btn btn-sm mark-read-btn" title="Mark as read">
+                                    <button class="notif-action-btn mark-read-btn" title="Mark as read">
                                         <i class="fa-regular fa-circle-check"></i>
                                     </button>
                                 }
-                                <button class="btn btn-sm delete-btn" title="Delete notification">
+                                <button class="notif-action-btn delete-btn" title="Delete">
                                     <i class="fa-regular fa-xmark"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted" style="font-size: 13px;">
-                <i class="fa-regular fa-circle-info me-1"></i>
-                Notifications are automatically marked as read when you view them
-            </div>
-            <span class="text-muted" style="font-size: 13px;">
+        <div class="d-flex justify-content-between align-items-center mt-4" style="font-size: 12px; color: var(--text-muted);">
+            <span><i class="fa-regular fa-circle-info me-1"></i> Notifications are marked read when you view them</span>
+            <span>
                 <i class="fa-regular fa-envelope me-1"></i> @Model.Count(n => n.EmailSent) emailed ·
                 <i class="fa-regular fa-message me-1"></i> @Model.Count(n => n.SmsSent) SMS'd
             </span>
@@ -154,11 +148,10 @@
 @section scripts {
     <script>
         $(document).ready(function () {
-            // Mark single notification as read
             $(document).on('click', '.mark-read-btn', function (e) {
                 e.stopPropagation();
                 var btn = $(this);
-                var item = btn.closest('.notification-item');
+                var item = btn.closest('.notif-row');
                 var id = item.data('id');
 
                 $.ajax({
@@ -167,29 +160,25 @@
                     data: { id: id },
                     success: function (response) {
                         if (response.success) {
-                            item.removeClass('unread').addClass('read');
-                            item.css('border-left-color', 'transparent');
-                            btn.fadeOut(function() { $(this).remove(); });
+                            item.removeClass('unread');
+                            btn.fadeOut(function () { $(this).remove(); });
                             updateUnreadCount();
                             updateMarkAllButton();
                         }
                     },
-                    error: function() {
+                    error: function () {
                         showToast('Error marking notification as read.', 'error');
                     }
                 });
             });
 
-            // Click notification item - navigate based on role
-            $(document).on('click', '.notification-item', function (e) {
-                // If click is on a button or link, ignore
+            $(document).on('click', '.notif-row', function (e) {
                 if ($(e.target).closest('button, a').length) return;
 
                 var item = $(this);
                 var id = item.data('id');
                 var targetUrl = item.data('target-url');
 
-                // Mark as read if not already
                 if (item.hasClass('unread')) {
                     $.ajax({
                         url: '@Url.Action("MarkAsRead", "Notification")',
@@ -198,9 +187,8 @@
                         async: false,
                         success: function (response) {
                             if (response.success) {
-                                item.removeClass('unread').addClass('read');
-                                item.css('border-left-color', 'transparent');
-                                item.find('.mark-read-btn').fadeOut(function() { $(this).remove(); });
+                                item.removeClass('unread');
+                                item.find('.mark-read-btn').fadeOut(function () { $(this).remove(); });
                                 updateUnreadCount();
                                 updateMarkAllButton();
                             }
@@ -208,13 +196,11 @@
                     });
                 }
 
-                // Navigate to the target URL
                 if (targetUrl && targetUrl !== '#') {
                     window.location.href = targetUrl;
                 }
             });
 
-            // Mark all notifications as read
             $('#markAllReadBtn').on('click', function () {
                 var btn = $(this);
                 btn.prop('disabled', true).html('<i class="fa-regular fa-spinner fa-spin me-1"></i> Processing...');
@@ -224,27 +210,22 @@
                     type: 'POST',
                     success: function (response) {
                         if (response.success) {
-                            $('.notification-item.unread').each(function () {
-                                $(this).removeClass('unread').addClass('read');
-                                $(this).css('border-left-color', 'transparent');
-                                $(this).find('.mark-read-btn').fadeOut(function() { $(this).remove(); });
-                            });
+                            $('.notif-row.unread').removeClass('unread').find('.mark-read-btn').fadeOut(function () { $(this).remove(); });
                             btn.fadeOut();
                             updateUnreadCount();
                             showToast('All notifications marked as read!', 'success');
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         btn.prop('disabled', false).html('<i class="fa-regular fa-circle-check me-1"></i> Mark All Read');
                     }
                 });
             });
 
-            // Delete single notification
             $(document).on('click', '.delete-btn', function (e) {
                 e.stopPropagation();
                 var btn = $(this);
-                var item = btn.closest('.notification-item');
+                var item = btn.closest('.notif-row');
                 var id = item.data('id');
 
                 if (!confirm('Delete this notification?')) return;
@@ -255,17 +236,14 @@
                     data: { id: id },
                     success: function (response) {
                         if (response.success) {
-                            item.slideUp(300, function() { $(this).remove(); });
+                            item.slideUp(300, function () { $(this).remove(); });
                             updateUnreadCount();
-                            if ($('.notification-item').length === 0) {
-                                location.reload();
-                            }
+                            if ($('.notif-row').length === 0) location.reload();
                         }
                     }
                 });
             });
 
-            // Clear all notifications
             $('#clearAllBtn').on('click', function () {
                 var btn = $(this);
                 if (!confirm('Delete all notifications? This cannot be undone.')) return;
@@ -277,18 +255,15 @@
                     type: 'POST',
                     success: function (response) {
                         if (response.success) {
-                            $('.notification-item').slideUp(400, function() {
-                                location.reload();
-                            });
+                            $('.notif-row').slideUp(400, function () { location.reload(); });
                         }
                     },
-                    complete: function() {
+                    complete: function () {
                         btn.prop('disabled', false).html('<i class="fa-regular fa-trash-can me-1"></i> Clear All');
                     }
                 });
             });
 
-            // Helper: Update unread count
             function updateUnreadCount() {
                 $.ajax({
                     url: '@Url.Action("GetUnreadCount", "Notification")',
@@ -296,14 +271,9 @@
                     success: function (response) {
                         var dot = $('.nav-badge-dot');
                         var count = $('#unreadCount');
-
                         if (response.unreadCount > 0) {
-                            if (dot.length) {
-                                dot.show();
-                            }
-                            if (count.length) {
-                                count.show().text(response.unreadCount > 99 ? '99+' : response.unreadCount);
-                            }
+                            dot.show();
+                            count.show().text(response.unreadCount > 99 ? '99+' : response.unreadCount);
                         } else {
                             dot.hide();
                             count.hide();
@@ -312,31 +282,20 @@
                 });
             }
 
-            // Helper: Update mark all button visibility
             function updateMarkAllButton() {
-                if ($('.notification-item.unread').length === 0) {
+                if ($('.notif-row.unread').length === 0) {
                     $('#markAllReadBtn').fadeOut();
                 }
             }
 
-            // Helper: Show toast notification
             function showToast(message, type) {
                 var toast = $('<div class="toast-message" style="position:fixed; bottom:20px; right:20px; padding:12px 20px; border-radius:8px; color:#fff; z-index:9999; max-width:400px; box-shadow:0 4px 12px rgba(0,0,0,0.15);">' + message + '</div>');
-                if (type === 'success') {
-                    toast.css('background', 'var(--green-mid)');
-                } else if (type === 'error') {
-                    toast.css('background', '#991b1b');
-                } else {
-                    toast.css('background', '#1e40af');
-                }
+                toast.css('background', type === 'success' ? 'var(--green-mid)' : (type === 'error' ? '#991b1b' : '#1e40af'));
                 $('body').append(toast);
-                setTimeout(function() {
-                    toast.fadeOut(300, function() { $(this).remove(); });
-                }, 3000);
+                setTimeout(function () { toast.fadeOut(300, function () { $(this).remove(); }); }, 3000);
             }
 
-            // Initial check to hide mark all button if no unread
-            if ($('.notification-item.unread').length === 0) {
+            if ($('.notif-row.unread').length === 0) {
                 $('#markAllReadBtn').hide();
             }
         });
@@ -344,109 +303,158 @@
 }
 
 <style>
-    .notification-item {
-        cursor: default;
-        transition: background-color 0.2s, border-color 0.2s;
-        position: relative;
+    .notif-timeline-wrap {
+        display: flex;
+        flex-direction: column;
     }
 
-        .notification-item.unread {
-            background-color: rgba(116, 198, 157, 0.06);
-        }
+    .notif-row {
+        display: flex;
+        gap: 14px;
+        cursor: pointer;
+    }
 
-            .notification-item.unread:hover {
-                background-color: rgba(116, 198, 157, 0.12);
-            }
+    .notif-icon-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex-shrink: 0;
+    }
 
-        .notification-item.read {
-            background-color: #ffffff;
-        }
-
-            .notification-item.read:hover {
-                background-color: #fafcfa;
-            }
-
-    .notification-icon {
-        width: 40px;
-        height: 40px;
+    .notif-icon-circle {
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
-        background: rgba(45, 106, 79, 0.08);
         display: flex;
         align-items: center;
         justify-content: center;
+        font-size: 14px;
+        background: rgba(45, 106, 79, 0.08);
         flex-shrink: 0;
-        font-size: 18px;
+        z-index: 1;
     }
 
-    .notif-type-badge {
-        font-size: 9px;
-        padding: 2px 8px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .notif-line {
+        flex: 1;
+        width: 2px;
+        background: #eef1ee;
+        margin: 4px 0;
+    }
+
+    .notif-row:last-child .notif-line {
+        display: none;
+    }
+
+    .notif-card {
+        flex: 1;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 14px;
+        transition: border-color 0.2s, background 0.2s;
+    }
+
+    .notif-row.unread .notif-card {
+        background: #f8fdf9;
+        border-color: #d4edda;
+    }
+
+    .notif-row:hover .notif-card {
+        border-color: var(--green-bright);
+    }
+
+    .notif-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .notif-title {
+        font-size: 14px;
         font-weight: 700;
+        color: var(--text-dark);
     }
 
-    .notif-channel-badge {
-        font-size: 9px;
-        padding: 2px 8px;
+    .notif-time {
+        font-size: 11px;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .notif-message {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: 10px;
+    }
+
+    .notif-bottom-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .notif-pill {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 3px 9px;
+        border-radius: 20px;
+    }
+
+    .notif-channel-icon {
+        font-size: 11px;
+        color: var(--text-muted);
     }
 
     .notif-detail-link {
-        display: inline-flex;
-        align-items: center;
+        margin-left: auto;
+        font-size: 12px;
+        font-weight: 600;
         color: var(--green-mid);
         text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        margin-top: 6px;
-        transition: gap 0.15s, color 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
     }
 
         .notif-detail-link:hover {
             color: var(--green-deep);
-            gap: 4px;
         }
 
-    .notification-item .mark-read-btn {
-        background: transparent;
-        border: none;
-        color: var(--green-mid);
-        padding: 4px 8px;
-        opacity: 0;
-        transition: opacity 0.2s, color 0.2s;
+    .notif-actions {
+        display: flex;
+        gap: 2px;
     }
 
-    .notification-item:hover .mark-read-btn {
-        opacity: 1;
-    }
-
-    .notification-item.unread .mark-read-btn {
-        opacity: 1;
-    }
-
-    .notification-item .mark-read-btn:hover {
-        color: var(--green-deep);
-    }
-
-    .notification-item .delete-btn {
+    .notif-action-btn {
         background: transparent;
         border: none;
         color: #b7c9bd;
-        padding: 4px 8px;
-        opacity: 0;
-        transition: opacity 0.2s;
+        padding: 3px 6px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: color 0.15s;
     }
 
-    .notification-item:hover .delete-btn {
-        opacity: 0.5 !important;
+    .mark-read-btn {
+        color: var(--green-mid);
     }
 
-    .notification-item .delete-btn:hover {
-        opacity: 1 !important;
-        color: #991b1b !important;
+        .mark-read-btn:hover {
+            color: var(--green-deep);
+        }
+
+    .delete-btn:hover {
+        color: #991b1b;
     }
 
-    /* Empty state */
     .empty-state .empty-icon-wrap {
         width: 88px;
         height: 88px;
@@ -463,7 +471,6 @@
             color: var(--green-bright);
         }
 
-    /* Toast animation */
     .toast-message {
         animation: slideIn 0.3s ease-out;
     }
@@ -480,54 +487,19 @@
         }
     }
 
-    /* Responsive */
     @@media (max-width: 576px) {
         .page-header h1 {
             font-size: 22px;
         }
 
-        .page-header .d-flex {
-            flex-direction: column;
-            align-items: stretch !important;
+        .notif-card {
+            padding: 12px 14px;
         }
 
-            .page-header .d-flex .d-flex {
-                flex-direction: row !important;
-                justify-content: stretch;
-            }
-
-                .page-header .d-flex .d-flex .btn-srr {
-                    flex: 1;
-                    text-align: center;
-                    justify-content: center;
-                    font-size: 13px;
-                }
-
-        .notification-item {
-            padding: 12px 16px !important;
-        }
-
-            .notification-item .d-flex {
-                gap: 10px !important;
-            }
-
-        .notification-icon {
-            width: 32px !important;
-            height: 32px !important;
-            font-size: 14px !important;
-        }
-
-        .notification-item h6 {
-            font-size: 14px !important;
-        }
-
-        .notification-item p {
-            font-size: 13px !important;
-        }
-
-        .notification-item .badge {
-            font-size: 8px !important;
-            padding: 1px 6px !important;
+        .notif-detail-link {
+            margin-left: 0;
+            width: 100%;
+            order: 10;
         }
     }
 </style>

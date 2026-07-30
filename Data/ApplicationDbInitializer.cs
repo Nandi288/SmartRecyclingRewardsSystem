@@ -7,16 +7,16 @@ using System.Data.Entity.Migrations;
 
 namespace SmartRecyclingRewardsSystem.Data
 {
-    public class ApplicationDbInitializer : CreateDatabaseIfNotExists<ApplicationDbContext>
+    public class ApplicationDbInitializer 
     {
-        protected override void Seed(ApplicationDbContext context)
+        public void SeedFromMigrations(ApplicationDbContext context)
         {
             SeedRoles(context);
             SeedAdminUser(context);
             SeedBadges(context);
             SeedSystemConfig(context);
+            SeedRewards(context);
 
-            base.Seed(context);
         }
 
         private void SeedRoles(ApplicationDbContext context)
@@ -68,7 +68,8 @@ namespace SmartRecyclingRewardsSystem.Data
                 new Badge { Name = "5-Week Streak", Description = "Recycled for 5 consecutive weeks", Criteria = "streak_5", IconClass = "fa fa-fire" },
                 new Badge { Name = "100kg Club", Description = "Recycled a total of 100 kg", Criteria = "total_weight_100", IconClass = "fa fa-trophy" },
                 new Badge { Name = "E-Waste Hero", Description = "Submitted 10 kg or more of e-waste", Criteria = "ewaste_10kg", IconClass = "fa fa-bolt" },
-                new Badge { Name = "Points Champion", Description = "Earned 1000 points total", Criteria = "total_points_1000", IconClass = "fa fa-star" }
+                new Badge { Name = "Points Champion", Description = "Earned 1000 points total", Criteria = "total_points_1000", IconClass = "fa fa-star" },
+                new Badge { Name = "Top Recycler", Description = "Ranked #1 on the monthly community leaderboard", Criteria = "monthly_rank_1", IconClass = "fa fa-crown" }
             );
             context.SaveChanges();
         }
@@ -132,6 +133,23 @@ namespace SmartRecyclingRewardsSystem.Data
                     Description = "Clickatell API key for SMS notifications",
                     LastUpdated = DateTime.Now
                 }
+            );
+            context.SaveChanges();
+        }
+
+        private void SeedRewards(ApplicationDbContext context)
+        {
+            context.Rewards.AddOrUpdate(r => r.Name,
+                new Reward { Name = "R50 Airtime Voucher", Description = "R50 airtime for any major SA network", PointsCost = 500, IsActive = true, ImageUrl = "/Content/images/rewards/airtime50.png" },
+                new Reward { Name = "R100 Airtime Voucher", Description = "R100 airtime for any major SA network", PointsCost = 950, IsActive = true, ImageUrl = "/Content/images/rewards/airtime100.png" },
+                new Reward { Name = "R50 Woolworths Voucher", Description = "R50 gift voucher redeemable at Woolworths", PointsCost = 600, IsActive = true, ImageUrl = "/Content/images/rewards/woolworths50.png" },
+                new Reward { Name = "R100 Checkers Voucher", Description = "R100 gift voucher redeemable at Checkers", PointsCost = 1100, IsActive = true, ImageUrl = "/Content/images/rewards/checkers100.png" },
+                new Reward { Name = "Reusable Shopping Bag", Description = "Durable EcoRewards SA branded canvas tote", PointsCost = 200, IsActive = true, ImageUrl = "/Content/images/rewards/tote.png" },
+                new Reward { Name = "Stainless Steel Water Bottle", Description = "500ml insulated eco-friendly bottle", PointsCost = 350, IsActive = true, ImageUrl = "/Content/images/rewards/bottle.png" },
+                new Reward { Name = "Reusable Produce Bag Set", Description = "Set of 5 mesh produce bags for grocery shopping", PointsCost = 250, IsActive = true, ImageUrl = "/Content/images/rewards/produce-bags.png" },
+                new Reward { Name = "Compost Starter Kit", Description = "Home composting bin and starter guide", PointsCost = 800, IsActive = true, ImageUrl = "/Content/images/rewards/compost-kit.png" },
+                new Reward { Name = "R150 Uber Eats Voucher", Description = "R150 voucher for Uber Eats orders", PointsCost = 1400, IsActive = true, ImageUrl = "/Content/images/rewards/ubereats.png" },
+                new Reward { Name = "Tree Planting Donation", Description = "Sponsor a tree planted in your name via a local NGO", PointsCost = 300, IsActive = true, ImageUrl = "/Content/images/rewards/tree.png" }
             );
             context.SaveChanges();
         }

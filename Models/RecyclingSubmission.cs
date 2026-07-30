@@ -29,11 +29,22 @@ namespace SmartRecyclingRewardsSystem.Models
         public int DropOffPointId { get; set; }
         public virtual DropOffPoint DropOffPoint { get; set; }
 
+        // The resident's own guess, entered when they log the submission.
+        // This is only ever shown as "estimated" - it is NOT used to
+        // calculate points or CO2 saved.
         [Required]
-        [Display(Name = "Weight (kg)")]
+        [Display(Name = "Estimated Weight (kg)")]
         [Column(TypeName = "decimal")]
         [Range(0.01, 99999.99, ErrorMessage = "Weight must be between 0.01 and 99999.99 kg")]
         public decimal WeightKg { get; set; }
+
+        // The real weight, entered by the Collection Officer when they
+        // verify the submission. This is nullable because it doesn't
+        // exist yet for Pending submissions - only Verified ones. This
+        // is the number points and CO2 saved get calculated from.
+        [Display(Name = "Actual Weight (kg)")]
+        [Column(TypeName = "decimal")]
+        public decimal? VerifiedWeightKg { get; set; }
 
         [Display(Name = "Submission Date")]
         public DateTime SubmissionDate { get; set; }

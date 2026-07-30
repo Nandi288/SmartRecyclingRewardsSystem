@@ -4,6 +4,33 @@
     var user = ViewBag.User as SmartRecyclingRewardsSystem.Models.ApplicationUser;
     var recentSubmissions = ViewBag.RecentSubmissions as List<SmartRecyclingRewardsSystem.Models.RecyclingSubmission>;
     var recentNotifications = ViewBag.RecentNotifications as List<SmartRecyclingRewardsSystem.Models.Notification>;
+
+    // Maps each notification's type to an icon, colour, and pill label
+    // for the timeline UI.
+    Func<SmartRecyclingRewardsSystem.Models.NotificationType, string[]> getNotifStyle = (type) =>
+    {
+        switch (type)
+        {
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionVerified:
+                return new[] { "fa-check", "#166534", "#dcfce7", "Verified" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionRejected:
+                return new[] { "fa-xmark", "#991b1b", "#fee2e2", "Rejected" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.SubmissionReceived:
+                return new[] { "fa-clock", "#854d0e", "#fef9c3", "Pending" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.PendingVerificationAlert:
+                return new[] { "fa-hourglass-half", "#1e40af", "#dbeafe", "Officer Alert" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.BadgeEarned:
+                return new[] { "fa-award", "#92620a", "#fef9c3", "Badge" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.AccountCreated:
+                return new[] { "fa-user-check", "#5a7a00", "#f3fcd4", "Welcome" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.RewardRedeemed:
+                return new[] { "fa-gift", "#5a7a00", "#f3fcd4", "Reward" };
+            case SmartRecyclingRewardsSystem.Models.NotificationType.GeneralAnnouncement:
+                return new[] { "fa-bullhorn", "#1e40af", "#dbeafe", "Announcement" };
+            default:
+                return new[] { "fa-bell", "#6b7c6e", "#f0f0f0", "Update" };
+        }
+    };
 }
 
 @section styles {
@@ -126,6 +153,9 @@
                 font-weight: 700;
                 color: var(--green-deep);
                 margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
             .section-head a {
@@ -192,49 +222,101 @@
             color: #991b1b;
         }
 
-        .notif-list {
-            padding: 0;
+        .unread-count-pill {
+            background: #ef4444;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 20px;
         }
 
-        .notif-item {
-            padding: 14px 18px;
-            border-bottom: 1px solid #f0f0f0;
+        /* ── Notification timeline ─────────────────────────────── */
+        .notif-timeline {
+            padding: 18px 20px;
+            position: relative;
         }
 
-            .notif-item:last-child {
-                border-bottom: none;
+        .notif-tl-item {
+            display: flex;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+            .notif-tl-item:last-child {
+                padding-bottom: 0;
             }
 
-            .notif-item.unread {
-                background: #f8fdf9;
+            .notif-tl-item:not(:last-child)::before {
+                content: '';
+                position: absolute;
+                left: 15px;
+                top: 32px;
+                bottom: 0;
+                width: 2px;
+                background: #eef1ee;
             }
 
-        .notif-title {
+        .notif-tl-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 13px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 3px;
+            flex-shrink: 0;
+            z-index: 1;
         }
 
-        .notif-msg {
+        .notif-tl-body {
+            flex: 1;
+            background: #fafbfa;
+            border: 1px solid #f0f0f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+
+        .notif-tl-item.unread .notif-tl-body {
+            background: #f8fdf9;
+            border-color: #d4edda;
+        }
+
+        .notif-tl-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .notif-tl-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .notif-tl-time {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .notif-tl-msg {
             font-size: 12px;
             color: var(--text-muted);
             line-height: 1.4;
+            margin-bottom: 8px;
         }
 
-        .notif-time {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        .notif-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--lime);
-            flex-shrink: 0;
-            margin-top: 4px;
+        .notif-tl-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 20px;
         }
 
         .quick-actions {
@@ -416,45 +498,53 @@
             </div>
         </div>
 
-        @* Right column — notifications *@
+        @* Right column — notifications (timeline style) ────────── *@
         <div class="section-card" style="align-self:start;">
             <div class="section-head">
                 <h2>
                     <i class="fa fa-bell fa-sm"></i> Notifications
                     @if (ViewBag.UnreadCount != null && (int)ViewBag.UnreadCount > 0)
                     {
-                        <span style="background:#ef4444;color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;margin-left:6px;">
-                            @ViewBag.UnreadCount
-                        </span>
+                        <span class="unread-count-pill">@ViewBag.UnreadCount</span>
                     }
                 </h2>
+                <a href="@Url.Action("Index", "Notification")">View all</a>
             </div>
-            <div class="notif-list">
-                @if (recentNotifications != null && recentNotifications.Count > 0)
-                {
-                    foreach (var n in recentNotifications)
+
+            @if (recentNotifications != null && recentNotifications.Count > 0)
+            {
+                <div class="notif-timeline">
+                    @foreach (var n in recentNotifications)
                     {
-                        <div class="notif-item @(!n.IsRead ? "unread" : "")">
-                            <div style="display:flex;gap:8px;">
-                                @if (!n.IsRead)
-                                {<div class="notif-dot"></div>}
-                                <div>
-                                    <div class="notif-title">@n.Title</div>
-                                    <div class="notif-msg">@n.Message</div>
-                                    <div class="notif-time">@n.CreatedAt.ToString("dd MMM, HH:mm")</div>
+                        var style = getNotifStyle(n.NotificationType);
+                        var icon = style[0];
+                        var color = style[1];
+                        var bg = style[2];
+                        var pillLabel = style[3];
+
+                        <div class="notif-tl-item @(!n.IsRead ? "unread" : "")">
+                            <div class="notif-tl-icon" style="background:@bg;color:@color;">
+                                <i class="fa @icon"></i>
+                            </div>
+                            <div class="notif-tl-body">
+                                <div class="notif-tl-top">
+                                    <div class="notif-tl-title">@n.Title</div>
+                                    <div class="notif-tl-time">@n.CreatedAt.ToString("dd MMM, HH:mm")</div>
                                 </div>
+                                <div class="notif-tl-msg">@n.Message</div>
+                                <span class="notif-tl-pill" style="background:@bg;color:@color;">@pillLabel</span>
                             </div>
                         </div>
                     }
-                }
-                else
-                {
-                    <div class="empty-state">
-                        <i class="fa fa-bell-slash"></i>
-                        No notifications yet.
-                    </div>
-                }
-            </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fa fa-bell-slash"></i>
+                    No notifications yet.
+                </div>
+            }
         </div>
 
     </div>

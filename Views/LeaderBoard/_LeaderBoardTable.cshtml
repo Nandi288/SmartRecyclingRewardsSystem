@@ -1,23 +1,145 @@
 @model System.Collections.Generic.List<SmartRecyclingRewardsSystem.ViewModels.CommunityLeaderboardViewModel>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Rank</th>
-            <th>Name</th>
-            <th>Points</th>
-            <th>Weight (kg)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var row in Model)
-        {
-            <tr class="@(row.IsCurrentUser ? "leaderboard-highlight" : "")">
-                <td>@row.Rank</td>
-                <td>@row.FirstName @row.LastName</td>
-                <td>@row.TotalPoints</td>
-                <td>@row.TotalRecycledkg.ToString("F1")</td>
-            </tr>
+@if (Model != null && Model.Any())
+{
+    <div class="srr-card" style="padding: 0; overflow: hidden;">
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th style="width: 70px;">Rank</th>
+                    <th>Resident</th>
+                    <th style="text-align: right;">Points</th>
+                    <th style="text-align: right;">Weight (kg)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    string medalClass = row.Rank == 1 ? "rank-gold"
+                                       : row.Rank == 2 ? "rank-silver"
+                                       : row.Rank == 3 ? "rank-bronze"
+                                       : "";
+
+                    <tr class="@(row.IsCurrentUser ? "leaderboard-highlight" : "")">
+                        <td>
+                            <span class="rank-badge @medalClass">
+                                @if (row.Rank <= 3)
+                                {
+                                    <i class="fa fa-trophy"></i>
+                                }
+                                else
+                                {
+                                    @row.Rank
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            @row.FirstName @row.LastName
+                            @if (row.IsCurrentUser)
+                            {
+                                <span class="you-pill">You</span>
+                            }
+                        </td>
+                        <td style="text-align: right; font-weight: 600; color: var(--green-mid);">
+                            @row.TotalPoints.ToString("N0")
+                        </td>
+                        <td style="text-align: right; color: var(--text-muted);">
+                            @row.TotalRecycledkg.ToString("F1")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="srr-card" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
+        <i class="fa fa-seedling" style="font-size: 32px; color: var(--green-bright); margin-bottom: 12px; display: block;"></i>
+        No verified submissions yet for this period. Be the first to recycle and claim the top spot!
+    </div>
+}
+
+<style>
+    .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+        .leaderboard-table thead th {
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-muted);
+            background: var(--offwhite);
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
         }
-    </tbody>
-</table>
+
+        .leaderboard-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            color: var(--text-dark);
+        }
+
+        .leaderboard-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: rgba(45, 106, 79, 0.03);
+        }
+
+    .leaderboard-highlight {
+        background: rgba(183, 224, 74, 0.12) !important;
+    }
+
+        .leaderboard-highlight td {
+            font-weight: 600;
+        }
+
+    .you-pill {
+        display: inline-block;
+        background: var(--lime);
+        color: var(--green-deep);
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        vertical-align: middle;
+    }
+
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--offwhite);
+        color: var(--text-muted);
+        font-weight: 700;
+        font-size: 13px;
+    }
+
+    .rank-gold {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .rank-silver {
+        background: #e5e7eb;
+        color: #4b5563;
+    }
+
+    .rank-bronze {
+        background: #fed7aa;
+        color: #9a3412;
+    }
+</style>

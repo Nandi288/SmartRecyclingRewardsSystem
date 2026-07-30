@@ -9,7 +9,75 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <style>
+        .introjs-tooltip {
+            background: #1a3a2a !important;
+            color: #fff !important;
+            border-radius: 12px !important;
+            font-family: 'Inter', sans-serif !important;
+            max-width: 320px !important;
+        }
+
+        .introjs-tooltiptext {
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            padding: 4px 2px !important;
+        }
+
+        .introjs-arrow {
+            border-color: #1a3a2a !important;
+        }
+
+        .introjs-button {
+            background: #b7e04a !important;
+            color: #1a3a2a !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+            text-shadow: none !important;
+            padding: 8px 16px !important;
+        }
+
+            .introjs-button:hover {
+                background: #c8f05a !important;
+                color: #1a3a2a !important;
+            }
+
+        .introjs-skipbutton {
+            background: transparent !important;
+            color: rgba(255,255,255,0.6) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+        }
+
+            .introjs-skipbutton:hover {
+                color: #fff !important;
+                border-color: #fff !important;
+            }
+
+        .introjs-bullets .introjs-bullet {
+            background: rgba(255,255,255,0.3) !important;
+        }
+
+            .introjs-bullets .introjs-bullet.active {
+                background: #b7e04a !important;
+            }
+
+        .introjs-helperLayer {
+            border-radius: 8px !important;
+        }
+
+        .introjs-progress {
+            background: rgba(255,255,255,0.15) !important;
+        }
+
+        .introjs-progressbar {
+            background: #b7e04a !important;
+        }
+    </style>
 
     <style>
         :root {
@@ -394,12 +462,41 @@
                 if (User.IsInRole("Resident"))
                 {
                     <span class="role-pill resident"><i class="fa fa-house fa-xs"></i> Resident</span>
-                    <a href="@Url.Action("Log", "Recycle")"><i class="fa fa-plus"></i> Log Recycling</a>
-                    <a href="@Url.Action("MySubmissions", "Recycle")">My Submissions</a>
-                    <a href="@Url.Action("Index", "Points")">Points</a>
-                    <a href="@Url.Action("Index", "Locations")">Drop-Offs</a>
-                    <a href="@Url.Action("Index", "CollectionEvents")"><i class="fa fa-calendar-days"></i> Events</a>
-                    <a href="@Url.Action("Index", "Impact")">My Impact</a>
+                    <a id="tourLog" href="@Url.Action("Log", "Recycle")"
+                       data-intro="Start here! Scan a QR code at your drop-off point to log what you've recycled." data-step="1">
+                        <i class="fa fa-plus"></i> Log Recycling
+                    </a>
+                    <a id="tourSubmissions" href="@Url.Action("MySubmissions", "Recycle")"
+                       data-intro="See every submission you've made and whether it's Pending, Verified, or Rejected." data-step="2">
+                        My Submissions
+                    </a>
+                    <a id="tourPoints" href="@Url.Action("Index", "Points")"
+                       data-intro="Track your points balance and see your full history of earning and spending." data-step="3">
+                        Points
+                    </a>
+                    <a id="tourRewards" href="@Url.Action("Index", "Rewards")"
+                       data-intro="Once you've got enough points, redeem them here for airtime, vouchers, and more." data-step="4">
+                        <i class="fa fa-gift fa-xs"></i> Rewards
+                    </a>
+                    <a id="tourLeaderboard" href="@Url.Action("Index", "LeaderBoard")"
+                       data-intro="See how your recycling compares to other residents this month and all-time." data-step="5">
+                        <i class="fa fa-ranking-star fa-xs"></i> Leaderboard
+                    </a>
+                    <a id="tourDropoffs" href="@Url.Action("Index", "Locations")"
+                       data-intro="Find drop-off points and upcoming collection events near you." data-step="6">
+                        Drop-Offs
+                    </a>
+                    <a id="tourEvents" href="@Url.Action("Index", "CollectionEvents")"
+                       data-intro="Register for community collection drives happening near you." data-step="7">
+                        <i class="fa fa-calendar-days"></i> Events
+                    </a>
+                    <a id="tourImpact" href="@Url.Action("Index", "Impact")"
+                       data-intro="See your personal environmental impact — total CO₂ saved by recycling." data-step="8">
+                        My Impact
+                    </a>
+                    <a href="#" onclick="startResidentTour(); return false;" style="color:#b7e04a;">
+                        <i class="fa fa-circle-question fa-xs"></i> Tour
+                    </a>
                 }
                 else if (User.IsInRole("CollectionOfficer"))
                 {
@@ -500,6 +597,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -536,6 +634,28 @@
             $(window).on('beforeunload', function () {
                 clearInterval(pollInterval);
             });
+        });
+
+        // ── Interactive Resident nav tour (Intro.js) ─────────────
+        function startResidentTour() {
+            introJs().setOptions({
+                nextLabel: 'Next →',
+                prevLabel: '← Back',
+                skipLabel: 'Skip',
+                doneLabel: 'Got it!',
+                exitOnOverlayClick: false,
+                showBullets: true
+            }).start();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var isResident = document.getElementById('tourLog') !== null;
+            var alreadySeenTour = localStorage.getItem('ecorewards_tour_seen') === 'true';
+
+            if (isResident && !alreadySeenTour) {
+                startResidentTour();
+                localStorage.setItem('ecorewards_tour_seen', 'true');
+            }
         });
     </script>
 
