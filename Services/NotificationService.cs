@@ -117,14 +117,19 @@ namespace SmartRecyclingRewardsSystem.Services
         // ============================================================
         public async Task NotifyVerifiedAsync(ApplicationUser resident, RecyclingSubmission submission)
         {
+            // VerifiedWeightKg is set by the officer in ConfirmVerify before
+            // this method is called, so it will always have a value here.
+            // We fall back to the resident's estimate only as a safety net.
+            var actualWeight = submission.VerifiedWeightKg ?? submission.WeightKg;
+
             var plainMessage = string.Format(
                 "Your submission of {0} kg of {1} at {2} has been VERIFIED. You earned {3} points.",
-                submission.WeightKg, submission.MaterialType.Name, submission.DropOffPoint.Name, submission.PointsAwarded);
+                actualWeight, submission.MaterialType.Name, submission.DropOffPoint.Name, submission.PointsAwarded);
 
             var details = new List<string[]>
             {
                 new[] { "Material", submission.MaterialType.Name },
-                new[] { "Weight", submission.WeightKg + " kg" },
+                new[] { "Weight", actualWeight + " kg" },
                 new[] { "Drop-Off Point", submission.DropOffPoint.Name },
                 new[] { "Points Earned", "+" + submission.PointsAwarded + " pts" },
                 new[] { "Status", "Verified" }
@@ -183,11 +188,11 @@ namespace SmartRecyclingRewardsSystem.Services
                 badge.Name, badge.Description);
 
             var details = new List<string[]>
-    {
-        new[] { "Badge", badge.Name },
-        new[] { "Description", badge.Description ?? "" },
-        new[] { "Earned On", DateTime.Now.ToString("dd MMM yyyy") }
-    };
+            {
+                new[] { "Badge", badge.Name },
+                new[] { "Description", badge.Description ?? "" },
+                new[] { "Earned On", DateTime.Now.ToString("dd MMM yyyy") }
+            };
 
             var html = BuildEmailHtml(
                 "New Badge Earned!",

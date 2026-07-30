@@ -41,5 +41,7 @@ namespace SmartRecyclingRewardsSystem.Models
         {
             EarnedAt = DateTime.Now;
         }
+
     }
+
 }
