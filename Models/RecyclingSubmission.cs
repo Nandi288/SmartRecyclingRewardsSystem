@@ -35,7 +35,7 @@ namespace SmartRecyclingRewardsSystem.Models
         [Required]
         [Display(Name = "Estimated Weight (kg)")]
         [Column(TypeName = "decimal")]
-        [Range(0.01, 99999.99, ErrorMessage = "Weight must be between 0.01 and 99999.99 kg")]
+        [Range(5.00, 99999.99, ErrorMessage = "Weight must be between 5.00 and 99999.99 kg")]
         public decimal WeightKg { get; set; }
 
         // The real weight, entered by the Collection Officer when they
