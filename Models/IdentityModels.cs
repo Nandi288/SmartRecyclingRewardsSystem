@@ -102,6 +102,7 @@ namespace SmartRecyclingRewardsSystem.Models
         public DbSet<SystemConfig> SystemConfigs { get; set; }
         public DbSet<Reward> Rewards { get; set; }
         public DbSet<RewardRedemption> RewardRedemptions { get; set; }
+      
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -174,5 +175,6 @@ namespace SmartRecyclingRewardsSystem.Models
             modelBuilder.Entity<RecyclingSubmission>()
                 .Property(s => s.CO2SavedKg).HasPrecision(10, 4);
         }
+
     }
 }

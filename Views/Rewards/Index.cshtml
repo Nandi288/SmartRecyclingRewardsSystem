@@ -202,9 +202,15 @@
             <h1><i class="fa fa-gift"></i> Rewards Catalogue</h1>
             <p>Redeem your points for real-world rewards.</p>
         </div>
-        <div class="balance-pill">
-            <div class="label">Your Balance</div>
-            <div class="num">@balance pts</div>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="balance-pill">
+                <div class="label">Your Balance</div>
+                <div class="num">@balance pts</div>
+            </div>
+            <a href="@Url.Action("History")" class="btn-srr" style="text-decoration: none; padding: 10px 18px; border-radius: 8px; background: var(--green-mid); color: #fff; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa fa-history"></i> History
+            </a>
+           
         </div>
     </div>
 
@@ -235,24 +241,19 @@
                     <div class="reward-desc">@reward.Description</div>
                     <div class="reward-cost"><i class="fa fa-leaf fa-xs"></i> @reward.PointsCost pts</div>
 
-                    @using (Html.BeginForm("Redeem", "Rewards", FormMethod.Post))
+                    @if (canAfford)
                     {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@reward.RewardId" />
-
-                        if (canAfford)
-                        {
-                            <button type="submit" class="btn-redeem"
-                                    onclick="return confirm('Redeem &quot;@reward.Name&quot; for @reward.PointsCost points?');">
-                                Redeem
-                            </button>
-                        }
-                        else
-                        {
-                            <button type="button" class="btn-locked" disabled>
-                                Need @(reward.PointsCost - balance) more pts
-                            </button>
-                        }
+                        <a href="@Url.Action("Redeem", new { id = reward.RewardId })"
+                           class="btn-redeem"
+                           style="text-decoration: none; text-align: center; display: block;">
+                            Redeem
+                        </a>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn-locked" disabled>
+                            Need @(reward.PointsCost - balance) more pts
+                        </button>
                     }
                 </div>
             }

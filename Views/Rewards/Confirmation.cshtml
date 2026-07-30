@@ -1,0 +1,101 @@
+﻿@model SmartRecyclingRewardsSystem.Models.RewardRedemption
+
+@{
+    ViewBag.Title = "Redemption Confirmed";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model == null)
+{
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="srr-card text-center">
+                    <div style="font-size: 64px; color: #ef4444;">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </div>
+                    <h3 style="font-family: 'Syne', sans-serif; color: #991b1b;">Redemption Not Found</h3>
+                    <p class="text-muted">We couldn't find your redemption record.</p>
+                    <a href="@Url.Action("Index")" class="btn-srr">Browse Rewards</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="srr-card text-center">
+                    <!-- Success Icon -->
+                    <div style="font-size: 64px; color: var(--lime);">
+                        <i class="fa fa-check-circle"></i>
+                    </div>
+
+                    <h3 style="font-family: 'Syne', sans-serif; color: var(--green-deep);">
+                        Redemption Successful! 🎉
+                    </h3>
+                    <p>You have successfully redeemed your reward.</p>
+
+                    <hr />
+
+                    <!-- Coupon Code -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="text-muted" style="font-size: 13px;">Your Coupon Code</div>
+                            <div style="font-size: 28px; font-weight: 700; font-family: 'Courier New', monospace; color: var(--green-mid); background: rgba(183, 224, 74, 0.15); padding: 12px 20px; border-radius: 12px; display: inline-block; border: 2px dashed var(--lime);">
+                                @Model.CouponCode
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Redemption Details -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-muted" style="font-size: 13px;">Reward</div>
+                            <div style="font-weight: 600;">
+                                @{
+                                    var rewardName = Model.Reward != null ? Model.Reward.Name : "Unknown Reward";
+                                }
+                                @rewardName
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-muted" style="font-size: 13px;">Points Spent</div>
+                            <div style="font-size: 20px; font-weight: 700; color: var(--green-deep);">
+                                -@Model.PointsSpent pts
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-muted" style="font-size: 13px;">Expires</div>
+                            <div style="font-weight: 600;">@(Model.CouponExpiryDate?.ToString("dd MMM yyyy") ?? "N/A")</div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <div class="mt-3">
+                            <span class="text-muted" style="font-size: 13px;">Transaction ID: @Model.TransactionId</span>
+                        </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2 justify-content-center mt-4 flex-wrap">
+                        <a href="@Url.Action("Index")" class="btn-srr">
+                            <i class="fa fa-arrow-left"></i> Browse Rewards
+                        </a>
+                        <a href="@Url.Action("History")" class="btn-srr btn-srr-outline">
+                            <i class="fa fa-history"></i> View History
+                        </a>
+                        <a href="javascript:window.print()" class="btn-srr btn-srr-lime">
+                            <i class="fa fa-print"></i> Print Coupon
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

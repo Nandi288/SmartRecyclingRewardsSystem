@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNet.Identity;
 using SmartRecyclingRewardsSystem.Models;
+using SmartRecyclingRewardsSystem.Services;
 using System;
+using System.Data.Entity;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace SmartRecyclingRewardsSystem.Controllers
@@ -10,11 +13,13 @@ namespace SmartRecyclingRewardsSystem.Controllers
     public class RewardsController : Controller
     {
         private readonly ApplicationDbContext _db = new ApplicationDbContext();
+        private readonly RewardService _rewardService;
 
-        // ============================================================
-        // GET: /Rewards/Index
-        // Lists active rewards + current points balance
-        // ============================================================
+        public RewardsController()
+        {
+            _rewardService = new RewardService(_db);
+        }
+
         public ActionResult Index()
         {
             var userId = User.Identity.GetUserId();
@@ -26,21 +31,23 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 .ToList();
 
             ViewBag.Resident = resident;
-            ViewBag.PointsBalance = GetPointsBalance(userId);
+            ViewBag.PointsBalance = resident?.PointsBalance ?? 0;
 
             return View(rewards);
         }
 
-        // ============================================================
-        // POST: /Rewards/Redeem
-        // Deducts points and logs a PointTransaction + RewardRedemption
-        // ============================================================
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Redeem(int id)
+        // GET: /Rewards/Redeem/{id}
+        public async Task<ActionResult> Redeem(int? id)
         {
+            if (id == null || id <= 0)
+            {
+                TempData["Error"] = "Invalid reward ID.";
+                return RedirectToAction("Index");
+            }
+
             var userId = User.Identity.GetUserId();
-            var reward = _db.Rewards.Find(id);
+            var user = _db.Users.Find(userId);
+            var reward = await _db.Rewards.FindAsync(id.Value);
 
             if (reward == null || !reward.IsActive)
             {
@@ -48,7 +55,7 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 return RedirectToAction("Index");
             }
 
-            int currentBalance = GetPointsBalance(userId);
+            int currentBalance = user?.PointsBalance ?? 0;
 
             if (currentBalance < reward.PointsCost)
             {
@@ -56,57 +63,59 @@ namespace SmartRecyclingRewardsSystem.Controllers
                 return RedirectToAction("Index");
             }
 
-            int newBalance = currentBalance - reward.PointsCost;
+            ViewBag.UserPoints = currentBalance;
+            return View(reward);
+        }
 
-            using (var dbTransaction = _db.Database.BeginTransaction())
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ProcessRedemption(int rewardId)
+        {
+            var userId = User.Identity.GetUserId();
+            var user = _db.Users.Find(userId);
+
+            var result = await _rewardService.ProcessRedemptionAsync(userId, rewardId);
+
+            if (result.Success)
             {
-                try
-                {
-                    _db.PointTransactions.Add(new PointTransaction
-                    {
-                        UserId = userId,
-                        TransactionType = TransactionType.Redeemed,
-                        Points = reward.PointsCost,
-                        BalanceAfter = newBalance,
-                        Description = $"Redeemed: {reward.Name}",
-                        TransactionDate = DateTime.Now
-                    });
+                user.PointsBalance = result.NewBalance;
+                await _db.SaveChangesAsync();
 
-                    _db.RewardRedemptions.Add(new RewardRedemption
-                    {
-                        UserId = userId,
-                        RewardId = reward.RewardId,
-                        PointsSpent = reward.PointsCost,
-                        RedemptionDate = DateTime.Now
-                    });
-
-                    _db.SaveChanges();
-                    dbTransaction.Commit();
-
-                    TempData["Success"] = $"You redeemed \"{reward.Name}\" for {reward.PointsCost} points!";
-                }
-                catch
-                {
-                    dbTransaction.Rollback();
-                    TempData["Error"] = "Something went wrong while redeeming. Please try again.";
-                }
+                TempData["Success"] = result.Message;
+                TempData["CouponCode"] = result.CouponCode;
+                return RedirectToAction("Confirmation", new { id = result.RedemptionId });
             }
 
+            TempData["Error"] = result.Message;
             return RedirectToAction("Index");
         }
 
-        // ============================================================
-        // Recalculates balance the same way PointsController would show it
-        // ============================================================
-        private int GetPointsBalance(string userId)
+        public async Task<ActionResult> Confirmation(int? id)
         {
-            var last = _db.PointTransactions
-                .Where(t => t.UserId == userId)
-                .OrderByDescending(t => t.TransactionDate)
-                .ThenByDescending(t => t.PointTransactionId)
-                .FirstOrDefault();
+            if (id == null || id <= 0)
+            {
+                TempData["Error"] = "Invalid redemption ID.";
+                return RedirectToAction("Index");
+            }
 
-            return last?.BalanceAfter ?? 0;
+            var redemption = await _db.RewardRedemptions
+                .Include(r => r.Reward)
+                .FirstOrDefaultAsync(r => r.RewardRedemptionId == id.Value);
+
+            if (redemption == null)
+            {
+                TempData["Error"] = "Redemption not found.";
+                return RedirectToAction("Index");
+            }
+
+            return View(redemption);
+        }
+
+        public async Task<ActionResult> History()
+        {
+            var userId = User.Identity.GetUserId();
+            var redemptions = await _rewardService.GetUserRedemptionsAsync(userId);
+            return View(redemptions);
         }
 
         protected override void Dispose(bool disposing)
