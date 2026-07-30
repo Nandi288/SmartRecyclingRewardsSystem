@@ -228,28 +228,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202607021222286_InitialCreate.cs" />
-    <Compile Include="Migrations\202607021222286_InitialCreate.Designer.cs">
-      <DependentUpon>202607021222286_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202607211850063_AddRewardsAndRedemptions.cs" />
-    <Compile Include="Migrations\202607211850063_AddRewardsAndRedemptions.Designer.cs">
-      <DependentUpon>202607211850063_AddRewardsAndRedemptions.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202607211928326_AddTopRecyclerBadgeAndRewards.cs" />
-    <Compile Include="Migrations\202607211928326_AddTopRecyclerBadgeAndRewards.Designer.cs">
-      <DependentUpon>202607211928326_AddTopRecyclerBadgeAndRewards.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.cs" />
-    <Compile Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.Designer.cs">
-      <DependentUpon>202607280946395_AddVerifiedWeightToSubmissions.cs</DependentUpon>
-    <Compile Include="Migrations\202607280057562_AddVirtualCardsAndCoupons.cs" />
-    <Compile Include="Migrations\202607280057562_AddVirtualCardsAndCoupons.Designer.cs">
-      <DependentUpon>202607280057562_AddVirtualCardsAndCoupons.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202607292003188_RemoveVirtualCards.cs" />
-    <Compile Include="Migrations\202607292003188_RemoveVirtualCards.Designer.cs">
-      <DependentUpon>202607292003188_RemoveVirtualCards.cs</DependentUpon>
+    <Compile Include="Migrations\202607301304253_InitialCreate.cs" />
+    <Compile Include="Migrations\202607301304253_InitialCreate.Designer.cs">
+      <DependentUpon>202607301304253_InitialCreate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModel.cs" />
@@ -417,22 +398,8 @@
     <Content Include="Scripts\jquery-3.7.0.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202607021222286_InitialCreate.resx">
-      <DependentUpon>202607021222286_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202607211850063_AddRewardsAndRedemptions.resx">
-      <DependentUpon>202607211850063_AddRewardsAndRedemptions.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202607211928326_AddTopRecyclerBadgeAndRewards.resx">
-      <DependentUpon>202607211928326_AddTopRecyclerBadgeAndRewards.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202607280946395_AddVerifiedWeightToSubmissions.resx">
-      <DependentUpon>202607280946395_AddVerifiedWeightToSubmissions.cs</DependentUpon>
-    <EmbeddedResource Include="Migrations\202607280057562_AddVirtualCardsAndCoupons.resx">
-      <DependentUpon>202607280057562_AddVirtualCardsAndCoupons.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202607292003188_RemoveVirtualCards.resx">
-      <DependentUpon>202607292003188_RemoveVirtualCards.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202607301304253_InitialCreate.resx">
+      <DependentUpon>202607301304253_InitialCreate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

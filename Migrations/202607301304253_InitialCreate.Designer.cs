@@ -7,13 +7,13 @@ namespace SmartRecyclingRewardsSystem.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.5.1")]
-    public sealed partial class AddRewardsAndRedemptions : IMigrationMetadata
+    public sealed partial class InitialCreate : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddRewardsAndRedemptions));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(InitialCreate));
         
         string IMigrationMetadata.Id
         {
-            get { return "202607211850063_AddRewardsAndRedemptions"; }
+            get { return "202607301304253_InitialCreate"; }
         }
         
         string IMigrationMetadata.Source
