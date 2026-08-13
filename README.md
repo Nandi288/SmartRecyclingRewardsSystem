@@ -37,21 +37,19 @@ EcoRewards SA gives residents a way to log their recycling activity and earn rew
 - Export reports to PDF and Excel
 - Manage rewards catalogue and view redemption requests
 
- 🛠️ Tech Stack
+ ## 🛠️ Tech Stack
 
-| Layer | Technology |
-
-Language | C# (.NET Framework 4.8) |
-Framework | ASP.NET MVC |
-ORM | Entity Framework 6 |
-Database | Microsoft SQL Server |
-Authentication | ASP.NET Identity with role-based access control 
-Frontend | Bootstrap 5, Razor Views, Font Awesome 6 
-Charts | Chart.js 
-PDF Export | iTextSharp 
-Excel Export | EPPlus 
-Deployment | Microsoft Azure App Service + Azure SQL Database 
-Version Control | Git + GitHub 
+* **Language:** C# (.NET Framework 4.8)
+* **Framework:** ASP.NET MVC
+* **ORM:** Entity Framework 6
+* **Database:** Microsoft SQL Server
+* **Authentication:** ASP.NET Identity with role-based access control
+* **Frontend:** Bootstrap 5, Razor Views, Font Awesome 6
+* **Charts:** Chart.js
+* **PDF Export:** iTextSharp
+* **Excel Export:** EPPlus
+* **Deployment:** Microsoft Azure App Service + Azure SQL Database
+* **Version Control:** Git + GitHub
 
 
 
