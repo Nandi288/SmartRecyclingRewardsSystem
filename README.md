@@ -1,7 +1,7 @@
 EcoRewards SA 🌿
 **A Smart Recycling Rewards System for eThekwini Municipality Residents**
 
-Live Demo: https://ecorewards-sa-cmeeangqfzegcfcg.centralindia-01.azurewebsites.net
+
 
 📋 Problem Statement
 
